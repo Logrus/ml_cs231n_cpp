@@ -6,63 +6,71 @@ LinearSVM::LinearSVM(int classes, int dimentionality) :
     dW(classes,dimentionality),
     scores(classes,1),
     lambda(0.5),
-    learning_rate(0.000001)
+    learning_rate(1.0e-10)
 {
 
+    // Randomly initialize weights
     std::default_random_engine generator;
     std::normal_distribution<float> distribution(0.0,0.00001);
-
-    // Randomly initialize weights
     for(int i=0; i < W.size(); ++i){
-        W.data[i] = distribution(generator);
+        W(i) = distribution(generator);
     }
+
+    // Initialize scores and gradient
+    std::fill(scores.data.begin(), scores.data.end(), 0.0);
+    std::fill(dW.data.begin(), dW.data.end(), 0.0);
 }
 
 float LinearSVM::L2W_reg(){
     float sum = 0;
     for (int i = 0; i < W.size(); ++i){
-        sum += W.data[i] * W.data[i];
+        sum += W(i) * W(i);
     }
     return sum;
 }
 
 void LinearSVM::updateWeights(){
     for (int i=0; i<W.size(); ++i){
-        W.data[i] += -learning_rate*dW.data[i];
-        //std::cout << "Weight " << i << " = " << W.data[i] << std::endl;
+        W(i) += -learning_rate*dW(i);
+        //std::cout << W(i) << " " << -learning_rate*dW(i) << std::endl;
     }
 }
 
 float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
 
+    assert(image.size() == 3073);
+
     // Reset scores
     std::fill(scores.data.begin(), scores.data.end(), 0.0);
 
+    // Compute scores
     // scores = W*x
-    for(int c=0; c < C; ++c){
-        for(int d=0; d < D; ++d){
-            scores.data[c] += image[d]*W(c,d);
+    for(int c=0; c<C; ++c){
+        for(int d=0; d<D; ++d){
+            scores(c) += image[d]*W(c,d);
         }
     }
+
+    // Compute loss
     count = 0;
     float loss = 0;
-    for (int c=0; c < C; ++c)
+    for (int c=0; c<C; ++c)
     {
         if( c == y ) continue;
-        float margin = scores(c,1) - scores(y,1) + 1;
+        float margin = scores(c) - scores(y) + 1;
         if (margin > 0.0f){
             loss += margin;
             count++;
         }
     }
 
-    // Update gradient
+    // Compute gradient update
     for(int c=0; c<C; ++c){
         for (int d=0; d<D; ++d){
             if (c == y){
-                dW(c,d) += -image[d]*count + lambda*W(c,d);
+                dW(c,d) += -count*image[d] + lambda*W(c,d);
             } else {
-                dW(c,d) += (scores.data[c]>0) * image[d]  + lambda*W(c,d);
+                dW(c,d) += (scores(c)>0)*image[d]  + lambda*W(c,d);
             }
         }
     }
@@ -72,6 +80,8 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
 
 float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::vector<int> &labels, int from, int to)
 {
+    assert(images.size() == 60000);
+
     // Reset gradient
     std::fill(dW.data.begin(), dW.data.end(), 0.0);
 
@@ -86,4 +96,18 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     std::cout << L << std::endl;
     updateWeights();
     return L;
+}
+
+int LinearSVM::inference(const std::vector<int> &image){
+    // Reset scores
+    std::fill(scores.data.begin(), scores.data.end(), 0.0);
+
+    // scores = W*x
+    for(int c=0; c < C; ++c){
+        for(int d=0; d < D; ++d){
+            scores(c) += image[d]*W(c,d);
+        }
+    }
+
+    return std::max_element(scores.data.begin(), scores.data.end()) - scores.data.begin();
 }
