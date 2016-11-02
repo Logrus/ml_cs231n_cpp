@@ -33,6 +33,7 @@ public:
 
     float loss_one_image(const std::vector<int> &image, const int &y);
     float loss(const std::vector< std::vector<int> > &images, const std::vector<int> &labels, int from, int to);
+    void normalizeGrad(int N);
     void updateWeights();
 
     int inference(const std::vector<int> &image);

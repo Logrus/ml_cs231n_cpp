@@ -32,7 +32,6 @@ float LinearSVM::L2W_reg(){
 void LinearSVM::updateWeights(){
     for (int i=0; i<W.size(); ++i){
         W(i) += -learning_rate*dW(i);
-        //std::cout << W(i) << " " << -learning_rate*dW(i) << std::endl;
     }
 }
 
@@ -54,10 +53,10 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
     // Compute loss
     count = 0;
     float loss = 0;
-    for (int c=0; c<C; ++c)
+    for (int j=0; j<C; ++j)
     {
-        if( c == y ) continue;
-        float margin = scores(c) - scores(y) + 1;
+        if( j == y ) continue;
+        float margin = scores(j) - scores(y) + 1;
         if (margin > 0.0f){
             loss += margin;
             count++;
@@ -68,9 +67,9 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
     for(int c=0; c<C; ++c){
         for (int d=0; d<D; ++d){
             if (c == y){
-                dW(c,d) += -count*image[d] + lambda*W(c,d);
+                dW(c,d) += -count*image[d];
             } else {
-                dW(c,d) += (scores(c)>0)*image[d]  + lambda*W(c,d);
+                dW(c,d) += (scores(c)>0)*image[d];
             }
         }
     }
@@ -85,7 +84,7 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     // Reset gradient
     std::fill(dW.data.begin(), dW.data.end(), 0.0);
 
-    // Compute scores for all images
+    // Compute loss for all images
     float L = 0;
     int N = to-from; // N images in dataset
     for(int i=from; i<to; ++i){
@@ -94,8 +93,24 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     L /= N;
     L += lambda * L2W_reg();
     std::cout << L << std::endl;
-    updateWeights();
+
+    // Normalize and regularize gradient
+    for (int i=0; i<dW.size(); ++i){
+        dW(i) += dW(i)/static_cast<float>(N) + lambda*W(i);
+    }
+
+    // Update weights
+    for (int i=0; i<W.size(); ++i){
+        W(i) += -learning_rate*dW(i);
+    }
+
     return L;
+}
+
+void LinearSVM::normalizeGrad(int N){
+    for (int i=0; i<dW.size(); ++i){
+        dW(i) += dW(i)/static_cast<float>(N);
+    }
 }
 
 int LinearSVM::inference(const std::vector<int> &image){
