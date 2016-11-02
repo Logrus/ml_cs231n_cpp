@@ -28,10 +28,10 @@ public:
      */
     float L2W_reg();
 
-    float loss_one_image(const std::vector<int> &image, const int &y);
-    float loss(const std::vector< std::vector<int> > &images, const std::vector<int> &labels, int from, int to);
+    float loss_one_image(const std::vector<float> &image, const int &y);
+    float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to);
 
-    int inference(const std::vector<int> &image);
+    int inference(const std::vector<float> &image);
 
 };
 

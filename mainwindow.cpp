@@ -61,7 +61,7 @@ void MainWindow::updateImage(){
         img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
-  img = img.scaledToWidth(ui->piclabel->width(), Qt::SmoothTransformation);
+  img = img.scaledToWidth(ui->piclabel->width());
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
   ui->labelLineEdit->setText(QString::fromStdString(label_names[reader.labels_[index]]));
 
@@ -132,9 +132,9 @@ void MainWindow::visualizeWeights(){
     weight2image(normW, 9, img9);
 
     img0=img0.scaledToWidth(ui->w1label->width(), Qt::SmoothTransformation);
-    img1=img2.scaledToWidth(ui->w2label->width(), Qt::SmoothTransformation);
-    img2=img3.scaledToWidth(ui->w3label->width(), Qt::SmoothTransformation);
-    img3=img4.scaledToWidth(ui->w4label->width(), Qt::SmoothTransformation);
+    img1=img1.scaledToWidth(ui->w2label->width(), Qt::SmoothTransformation);
+    img2=img2.scaledToWidth(ui->w3label->width(), Qt::SmoothTransformation);
+    img3=img3.scaledToWidth(ui->w4label->width(), Qt::SmoothTransformation);
     img4=img4.scaledToWidth(ui->w5label->width(), Qt::SmoothTransformation);
     img5=img5.scaledToWidth(ui->w6label->width(), Qt::SmoothTransformation);
     img6=img6.scaledToWidth(ui->w7label->width(), Qt::SmoothTransformation);

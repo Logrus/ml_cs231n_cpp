@@ -3,7 +3,7 @@ LinearSVM::LinearSVM(int classes, int dimentionality) :
     C(classes),
     D(dimentionality),
     lambda(0.5),
-    learning_rate(1.0e-9)
+    learning_rate(1.0e-8)
 {
     W.setSize(classes, dimentionality);
     dW.setSize(classes, dimentionality);
@@ -34,7 +34,7 @@ float LinearSVM::L2W_reg(){
     return sum;
 }
 
-float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
+float LinearSVM::loss_one_image(const std::vector<float> &image, const int &y){
 
     assert(image.size() == 3073);
 
@@ -55,9 +55,11 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
     for (int j=0; j<C; ++j)
     {
         if(j==y) continue;
-        margins[j] = std::max(0.f, scores[j] - scores[y] + 1);
+        margins[j] = scores[j] - scores[y] + 1;
+
+        loss += std::max(0.f,margins[j]);
+
         counter += (margins[j]>0);
-        loss += margins[j];
 
     }
 
@@ -66,7 +68,7 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
         for (int d=0; d<D; ++d){
             if(j==y){
                 dW(j,d) += -image[d]*counter;
-            } else if(j!=y) {
+            } else {
                 dW(j,d) += (margins[j]>0)*image[d];
             }
         }
@@ -75,7 +77,7 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
     return loss;
 }
 
-float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::vector<int> &labels, int from, int to)
+float LinearSVM::loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to)
 {
     assert(images.size() == 50000);
     assert(C == 10);
@@ -113,7 +115,7 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     return L;
 }
 
-int LinearSVM::inference(const std::vector<int> &image){
+int LinearSVM::inference(const std::vector<float> &image){
 
     std::vector<float> scores(10, 0);
 

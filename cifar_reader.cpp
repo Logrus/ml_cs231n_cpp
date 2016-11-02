@@ -16,18 +16,18 @@ bool CIFAR10Reader::read_bin(std::string filepath){
   for(int i = 0; i < number_of_images; ++i)
   {
       //read label for the image
-      char tplabel;
-      file.read(&tplabel, sizeof(tplabel));
+      unsigned char tplabel = 0;
+      file.read((char*) &tplabel, sizeof(tplabel));
       //push to the vector of labels
-      labels_.push_back(static_cast<int>(tplabel));
+      labels_.push_back((int)tplabel);
 
-      std::vector<int> picture;
+      std::vector<float> picture;
       for(int channel = 0; channel < 3; ++channel){
           for(int x = 0; x < n_rows; ++x){
               for(int y = 0; y < n_cols; ++y){
-                 char temp = 0;
-                 file.read(&temp, sizeof(temp));
-                 picture.push_back(static_cast<int>(temp));
+                 unsigned  char temp = 0;
+                 file.read((char*) &temp, sizeof(temp));
+                 picture.push_back((int)temp);
               }
           }
       }
