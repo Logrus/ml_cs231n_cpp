@@ -27,7 +27,7 @@
      <string>Train SVM</string>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -50,9 +50,12 @@
      <item>
       <widget class="QLineEdit" name="predictionLineEdit"/>
      </item>
+     <item>
+      <widget class="QSpinBox" name="labelSpinBox"/>
+     </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -134,20 +137,9 @@
      </item>
     </layout>
    </widget>
-   <zorder>piclabel</zorder>
-   <zorder>labelLineEdit</zorder>
+   <zorder>layoutWidget</zorder>
+   <zorder>layoutWidget</zorder>
    <zorder>pushButton</zorder>
-   <zorder>piclabel</zorder>
-   <zorder>w1label</zorder>
-   <zorder>w2label</zorder>
-   <zorder>w3label</zorder>
-   <zorder>w4label</zorder>
-   <zorder>w5label</zorder>
-   <zorder>w6label</zorder>
-   <zorder>w7label</zorder>
-   <zorder>w8label</zorder>
-   <zorder>w9label</zorder>
-   <zorder>w10label</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -155,7 +147,7 @@
      <x>0</x>
      <y>0</y>
      <width>692</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuOpen_dataset">

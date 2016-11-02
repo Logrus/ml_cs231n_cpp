@@ -32,6 +32,8 @@ private:
     void visualizeWeights();
     float evaluateAcc();
 
+    std::vector<std::string> label_names;
+
     Ui::MainWindow *ui;
     CIFAR10Reader reader;
     LinearSVM svm;

@@ -5,7 +5,7 @@ LinearSVM::LinearSVM(int classes, int dimentionality) :
     W(classes,dimentionality),
     dW(classes,dimentionality),
     lambda(0.5),
-    learning_rate(1.0e-9)
+    learning_rate(1.0e-7)
 {
 
     // Randomly initialize weights
@@ -43,21 +43,26 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
 
     // Compute loss
     float loss = 0;
+    int counter = 0;
+    std::vector<float> margins(10,0);
     for (int j=0; j<C; ++j)
     {
         if(j==y) continue;
-        float margin = scores[j] - scores[y] + 1;
-        if (margin > 0.0f){
-            loss += margin;
+        margins[j] = scores[j] - scores[y] + 1;
+        counter += (margins[j]>0);
+        loss += std::max(0.0f, margins[j]);
 
-            // Compute gradient
-            for (int d=0; d<D; ++d){
-                dW(y,d) -= image[d];
-                dW(j,d) += image[d];
-            }
-
-        }
     }
+
+    // Compute gradient
+    for (int j=0; j<C; ++j)
+        for (int d=0; d<D; ++d){
+            if(j==y){
+                dW(j,d) = -image[d]*counter;
+            } else if(j!=y) {
+                dW(j,d) += (margins[j]>0)*image[d];
+            }
+        }
 
 
     return loss;

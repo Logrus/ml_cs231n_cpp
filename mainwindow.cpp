@@ -8,8 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
-
     // TODO: remove later
 
     QDir dir("../CIFAR10/");
@@ -30,6 +28,10 @@ MainWindow::MainWindow(QWidget *parent) :
     updateImage();
 
     visualizeWeights();
+
+    int image_index = ui->labelSpinBox->value();
+    int label = svm.inference(reader.images_[image_index]);
+
 
     
 }
