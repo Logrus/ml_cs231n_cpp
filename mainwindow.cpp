@@ -9,6 +9,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // TODO: remove later
+    label_names.push_back("airplane");
+    label_names.push_back("automobile");
+    label_names.push_back("bird");
+    label_names.push_back("cat");
+    label_names.push_back("deer");
+    label_names.push_back("dog");
+    label_names.push_back("frog");
+    label_names.push_back("horse");
+    label_names.push_back("ship");
+    label_names.push_back("truck");
 
     QDir dir("../CIFAR10/");
 
@@ -29,11 +39,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     visualizeWeights();
 
-    int image_index = ui->labelSpinBox->value();
-    int label = svm.inference(reader.images_[image_index]);
-
-
-    
 }
 
 MainWindow::~MainWindow()
@@ -42,7 +47,7 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::updateImage(){
-  int index=0;
+  int index = ui->labelSpinBox->value();
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
@@ -54,7 +59,10 @@ void MainWindow::updateImage(){
   }
   img = img.scaledToWidth(ui->piclabel->width(), Qt::SmoothTransformation);
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
-  ui->labelLineEdit->setText(QString::number(reader.labels_[index]));
+  ui->labelLineEdit->setText(QString::fromStdString(label_names[reader.labels_[index]]));
+
+  int predicted_label = svm.inference(reader.images_[index]);
+  ui->predictionLineEdit->setText(QString::fromStdString( label_names[reader.labels_[predicted_label]] ));
 }
 
 void MainWindow::on_actionOpen_dataset_triggered()
@@ -79,16 +87,19 @@ void MainWindow::on_actionOpen_dataset_triggered()
     updateImage();
 }
 
-void weight2image(const CMatrix<float> &W, int label, QImage &img){
- for (int x = 0; x < 32; ++x) {
-    for (int y = 0; y < 32; ++y) {
-      int red   = W(label,y*32+x);
-      int green = W(label,1024+y*32+x);
-      int blue  = W(label,2048+y*32+x);
-      img.setPixel(x, y, qRgb(red, green, blue));
-    }
-  }
-}
+void weight2image(CMatrix<float> w, int label, QImage &img){
+
+
+    for (int x = 0; x < 32; ++x) {
+       for (int y = 0; y < 32; ++y) {
+         int red=w(label,y*32+x);
+         int green=w(label,1024+y*32+x);
+         int blue=w(label,2048+y*32+x);
+         img.setPixel(x, y, qRgb(red, green, blue));
+       }
+     }
+
+   }
 
 void MainWindow::visualizeWeights(){
     QImage img0(32, 32, QImage::Format_RGB888);
@@ -142,8 +153,8 @@ void MainWindow::visualizeWeights(){
 
 float MainWindow::evaluateAcc(){
     int correct = 0;
-    int total = 0;
-    for(int i=50000; i<55000; ++i){
+    int total = 0;updateImage();
+    for(int i=50000; i<51000; ++i){
        int label = svm.inference(reader.images_[0]);
        if(label == reader.labels_[i]) correct++;
        total++;
@@ -154,17 +165,23 @@ float MainWindow::evaluateAcc(){
 
 void MainWindow::on_pushButton_clicked()
 {
-    int bs = 100;
-    for(int iter = 0; iter < 100; iter++){
+
+    for(int iter = 0; iter < 50000*2; iter++){
 
         float acc = evaluateAcc();
-        std::cout << "Accuracy " << acc << std::endl;
+        //std::cout << "Accuracy " << acc << std::endl;
+        ui->accLabel->setText("Accuracy: " + QString::number(acc));
         //ui->statusBar->showMessage("Accuracy " + QString::number(acc));
 
-        for(int i=1; i<50; ++i){
-            svm.loss(reader.images_, reader.labels_, i*bs, i*bs + bs - 1);
-            visualizeWeights();
-            qApp->processEvents();
-        }
+        float loss = svm.loss(reader.images_, reader.labels_, 0, 0);
+        ui->lossLabel->setText("Loss: " + QString::number(loss));
+        visualizeWeights();
+        qApp->processEvents();
+
     }
+}
+
+void MainWindow::on_labelSpinBox_valueChanged(int arg1)
+{
+    updateImage();
 }

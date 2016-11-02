@@ -28,6 +28,8 @@ private slots:
 
     void on_pushButton_clicked();
 
+    void on_labelSpinBox_valueChanged(int arg1);
+
 private:
     void visualizeWeights();
     float evaluateAcc();
