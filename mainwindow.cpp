@@ -28,7 +28,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
     QStringList filters;
-    filters << "*.bin";
+    filters << "data_batch_1.bin";
+    filters << "data_batch_2.bin";
+    filters << "data_batch_3.bin";
+    filters << "data_batch_4.bin";
+    filters << "data_batch_5.bin";
     dir.setNameFilters(filters);
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
@@ -149,13 +153,24 @@ void MainWindow::visualizeWeights(){
     ui->w9label->setPixmap(QPixmap::fromImage(img8));
     ui->w10label->setPixmap(QPixmap::fromImage(img9));
 
+    ui->w1label->show();
+    ui->w2label->show();
+    ui->w3label->show();
+    ui->w4label->show();
+    ui->w5label->show();
+    ui->w6label->show();
+    ui->w7label->show();
+    ui->w8label->show();
+    ui->w9label->show();
+    ui->w10label->show();
+
 }
 
 float MainWindow::evaluateAcc(){
     int correct = 0;
-    int total = 0;updateImage();
-    for(int i=50000; i<51000; ++i){
-       int label = svm.inference(reader.images_[0]);
+    int total = 0;
+    for(int i=5000; i<=6000; ++i){
+       int label = svm.inference(reader.images_[i]);
        if(label == reader.labels_[i]) correct++;
        total++;
     }
@@ -165,18 +180,21 @@ float MainWindow::evaluateAcc(){
 
 void MainWindow::on_pushButton_clicked()
 {
+    int bs = 100;
+    int iters = 50000/bs;
+    for(int epoch = 0; epoch < 1; epoch++){
 
-    for(int iter = 0; iter < 50000*2; iter++){
+        for(int i=0; i<iters; ++i){
+            float loss = svm.loss(reader.images_, reader.labels_, i*bs, i*bs + bs);
+            ui->lossLabel->setText("Loss: " + QString::number(loss));
+            visualizeWeights();
+            qApp->processEvents();
+
+        }
 
         float acc = evaluateAcc();
-        //std::cout << "Accuracy " << acc << std::endl;
+        std::cout << "Accuracy " << acc << std::endl;
         ui->accLabel->setText("Accuracy: " + QString::number(acc));
-        //ui->statusBar->showMessage("Accuracy " + QString::number(acc));
-
-        float loss = svm.loss(reader.images_, reader.labels_, 0, 0);
-        ui->lossLabel->setText("Loss: " + QString::number(loss));
-        visualizeWeights();
-        qApp->processEvents();
 
     }
 }

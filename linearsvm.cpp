@@ -3,7 +3,7 @@ LinearSVM::LinearSVM(int classes, int dimentionality) :
     C(classes),
     D(dimentionality),
     lambda(0.5),
-    learning_rate(0.00000000001)
+    learning_rate(1.0e-9)
 {
     W.setSize(classes, dimentionality);
     dW.setSize(classes, dimentionality);
@@ -77,15 +77,19 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
 
 float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::vector<int> &labels, int from, int to)
 {
-    assert(images.size() == 60000);
+    assert(images.size() == 50000);
+    assert(C == 10);
+    assert(D == 3073);
+
+    std::cout << "From " << from << " to " << to << " size " << to-from << std::endl;
 
     // Reset gradient
     dW.fill(0.0);
 
     // Compute loss for all images
     float L = 0;
-    int N = 100; // N images in batch
-    for(int i=0; i<N; ++i){
+    int N = to-from; // N images in batch
+    for(int i=from; i<to; ++i){
         L += loss_one_image(images[i], labels[i]);
     }
     L /= N;
@@ -95,7 +99,7 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     // Normalize and regularize gradient
     for (int x=0; x< dW.xSize(); ++x){
         for (int y=0; y < dW.ySize(); ++y){
-            dW(x,y) = dW(x,y)/static_cast<float>(N); // + lambda*W(x,y);
+            dW(x,y) = dW(x,y)/static_cast<float>(N) + lambda*W(x,y);
         }
     }
 
@@ -103,9 +107,7 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     for (int x=0; x<W.xSize(); ++x){
         for (int y=0; y<W.ySize(); ++y){
             W(x, y) -= learning_rate*dW(x, y);
-            //std::cout << "W (" << x << ", " << y << "): " <<  W(x, y) << " ";
         }
-        //std::cout << std::endl;
     }
 
     return L;
