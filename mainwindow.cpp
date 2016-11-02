@@ -79,7 +79,7 @@ void MainWindow::on_actionOpen_dataset_triggered()
     updateImage();
 }
 
-void weight2image(const Matrix &W, int label, QImage &img){
+void weight2image(const CMatrix<float> &W, int label, QImage &img){
  for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
       int red   = W(label,y*32+x);
@@ -102,17 +102,19 @@ void MainWindow::visualizeWeights(){
     QImage img8(32, 32, QImage::Format_RGB888);
     QImage img9(32, 32, QImage::Format_RGB888);
 
-    Matrix normW = svm.W.normalize(0,255);
-    weight2image(normW,0, img0);
-    weight2image(normW,1, img1);
-    weight2image(normW,2, img2);
-    weight2image(normW,3, img3);
-    weight2image(normW,4, img4);
-    weight2image(normW,5, img5);
-    weight2image(normW,6, img6);
-    weight2image(normW,7, img7);
-    weight2image(normW,8, img8);
-    weight2image(normW,9, img9);
+    CMatrix<float> normW = svm.W;
+    normW.normalize(0,255);
+
+    weight2image(normW, 0, img0);
+    weight2image(normW, 1, img1);
+    weight2image(normW, 2, img2);
+    weight2image(normW, 3, img3);
+    weight2image(normW, 4, img4);
+    weight2image(normW, 5, img5);
+    weight2image(normW, 6, img6);
+    weight2image(normW, 7, img7);
+    weight2image(normW, 8, img8);
+    weight2image(normW, 9, img9);
 
     img0=img0.scaledToWidth(ui->w1label->width(), Qt::SmoothTransformation);
     img1=img2.scaledToWidth(ui->w2label->width(), Qt::SmoothTransformation);

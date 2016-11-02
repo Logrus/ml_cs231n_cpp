@@ -2,28 +2,32 @@
 LinearSVM::LinearSVM(int classes, int dimentionality) :
     C(classes),
     D(dimentionality),
-    W(classes,dimentionality),
-    dW(classes,dimentionality),
     lambda(0.5),
     learning_rate(1.0e-7)
 {
+    W.setSize(classes, dimentionality);
+    dW.setSize(classes, dimentionality);
 
     // Randomly initialize weights
     std::default_random_engine generator;
     std::normal_distribution<float> distribution(0.0,0.0001);
-    for(int i=0; i < W.size(); ++i){
-        W(i) = distribution(generator);
+    for(int x=0; x < W.xSize(); ++x){
+        for(int y=0; y < W.ySize(); ++y)
+        {
+            W(x,y) = distribution(generator);
+        }
     }
 
     // Initialize gradient
-    std::fill(dW.data.begin(), dW.data.end(), 0.0);
+    dW.fill(0.0);
 }
 
 float LinearSVM::L2W_reg(){
     float sum = 0;
-    for (int i = 0; i < W.size(); ++i){
-        sum += W(i) * W(i);
-    }
+    for (int x = 0; x < W.xSize(); ++x)
+        for (int y = 0; y < W.ySize(); ++y){
+            sum += W(x,y) * W(x,y);
+        }
     return sum;
 }
 
@@ -48,9 +52,9 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
     for (int j=0; j<C; ++j)
     {
         if(j==y) continue;
-        margins[j] = scores[j] - scores[y] + 1;
+        margins[j] = std::max(0.f, scores[j] - scores[y] + 1);
         counter += (margins[j]>0);
-        loss += std::max(0.0f, margins[j]);
+        loss += margins[j];
 
     }
 
@@ -58,7 +62,7 @@ float LinearSVM::loss_one_image(const std::vector<int> &image, const int &y){
     for (int j=0; j<C; ++j)
         for (int d=0; d<D; ++d){
             if(j==y){
-                dW(j,d) = -image[d]*counter;
+                dW(j,d) += -image[d]*counter;
             } else if(j!=y) {
                 dW(j,d) += (margins[j]>0)*image[d];
             }
@@ -73,7 +77,7 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     assert(images.size() == 60000);
 
     // Reset gradient
-    std::fill(dW.data.begin(), dW.data.end(), 0.0);
+    dW.fill(0.0);
 
     // Compute loss for all images
     float L = 0;
@@ -86,13 +90,17 @@ float LinearSVM::loss(const std::vector< std::vector<int> > &images, const std::
     std::cout << "Loss: " << L << std::endl;
 
     // Normalize and regularize gradient
-    for (int i=0; i<dW.size(); ++i){
-        dW(i) = dW(i)/static_cast<float>(N) + lambda*W(i);
+    for (int x=0; x< dW.xSize(); ++x){
+        for (int y=0; y < dW.ySize(); ++y){
+            dW(x,y) = dW(x,y)/static_cast<float>(N) + lambda*W(x,y);
+        }
     }
 
     // Update weights
-    for (int i=0; i<W.size(); ++i){
-        W(i) += -learning_rate*dW(i);
+    for (int x=0; x<W.xSize(); ++x){
+        for (int y=0; y<W.ySize(); ++y){
+            W(x, y) += -learning_rate*dW(x, y);
+        }
     }
 
     return L;

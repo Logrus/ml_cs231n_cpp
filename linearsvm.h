@@ -6,15 +6,15 @@
 #include <random>
 #include <algorithm>
 #include <assert.h>
-#include "matrix.h"
+#include "CMatrix.h"
 
 class LinearSVM
 {
 public:
     LinearSVM(int, int);
 
-    Matrix W;
-    Matrix dW;
+    CMatrix<float> W;
+    CMatrix<float> dW;
 
     int C; // classes
     int D; // data dimentionality

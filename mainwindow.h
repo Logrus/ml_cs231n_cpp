@@ -8,7 +8,7 @@
 #include <iostream>
 #include "cifar_reader.h"
 #include "linearsvm.h"
-#include "matrix.h"
+#include "CMatrix.h"
 
 namespace Ui {
 class MainWindow;
