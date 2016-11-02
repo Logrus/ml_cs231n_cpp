@@ -155,7 +155,7 @@ void MainWindow::on_pushButton_clicked()
 
         float acc = evaluateAcc();
         std::cout << "Accuracy " << acc << std::endl;
-        ui->statusBar->showMessage("Accuracy " + QString::number(acc));
+        //ui->statusBar->showMessage("Accuracy " + QString::number(acc));
 
         for(int i=1; i<50; ++i){
             svm.loss(reader.images_, reader.labels_, i*bs, i*bs + bs - 1);

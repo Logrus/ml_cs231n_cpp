@@ -10,6 +10,7 @@ public:
 
     float& operator()(const int idx);
     float const & operator()(const int idx) const;
+
     float& operator()(const int col, const int row);
     float const & operator()(const int col, const int row) const;
 
@@ -19,7 +20,7 @@ public:
 
     int size();
 
-    Matrix normalize(int lower, int higher);
+    Matrix normalize(float lower, float higher);
 };
 
 #endif // MATRIX_H

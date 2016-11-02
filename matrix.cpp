@@ -1,8 +1,8 @@
 #include "matrix.h"
 
-Matrix::Matrix(int col, int row) : ySize(row), xSize(col)
+Matrix::Matrix(int rows, int cols) : ySize(rows), xSize(cols)
 {
-    data.resize(row*col);
+    data.resize(rows*cols);
 }
 
 float& Matrix::operator()(const int idx){
@@ -13,11 +13,11 @@ float const & Matrix::operator()(const int idx) const {
     return data[idx];
 }
 
-float& Matrix::operator()(const int col, const int row){
+float& Matrix::operator()(const int row, const int col){
     return data[col + row*xSize];
 }
 
-float const & Matrix::operator()(const int col, const int row) const {
+float const & Matrix::operator()(const int row, const int col) const {
     return data[col + row*xSize];
 }
 
@@ -25,7 +25,7 @@ int Matrix::size(){
     return xSize*ySize;
 }
 
-Matrix Matrix::normalize(int lower, int higher){
+Matrix Matrix::normalize(float lower, float higher){
     Matrix res(xSize, ySize);
 
     float maxval = std::numeric_limits<float>::min();
