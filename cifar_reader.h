@@ -10,5 +10,10 @@ public:
   
   std::vector<int> labels_;
   std::vector< std::vector<float> > images_;
+
+  // Data processing
+  // normalize()
+  // standardize()
+  // mean_image
 };
 

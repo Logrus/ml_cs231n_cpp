@@ -1,10 +1,11 @@
-#include "linearsvm.h"
-LinearSVM::LinearSVM(int classes, int dimentionality) :
+#include "linearsoftmax.h"
+
+LinearSoftmax::LinearSoftmax(int classes, int dimentionality) :
     Classifier(classes, dimentionality)
 {
 }
 
-void LinearSVM::initializeW(){
+void LinearSoftmax::initializeW(){
     // Randomly initialize weights
     std::default_random_engine generator;
     std::normal_distribution<float> distribution(0,0.00001);
@@ -19,7 +20,7 @@ void LinearSVM::initializeW(){
     }
 }
 
-float LinearSVM::L2W_reg(){
+float LinearSoftmax::L2W_reg(){
     float sum = 0;
     for (int x = 0; x < W.xSize(); ++x)
         for (int y = 0; y < W.ySize(); ++y){
@@ -28,7 +29,7 @@ float LinearSVM::L2W_reg(){
     return sum;
 }
 
-float LinearSVM::loss_one_image(const std::vector<float> &image, const int &y){
+float LinearSoftmax::loss_one_image(const std::vector<float> &image, const int &y){
 
     assert(image.size() == 3073);
 
@@ -43,36 +44,49 @@ float LinearSVM::loss_one_image(const std::vector<float> &image, const int &y){
     }
 
     // Compute loss
-    float loss = 0;
-    int counter = 0;
-    std::vector<float> margins(10,0);
-    for (int j=0; j<C; ++j)
-    {
-        if(j==y) continue;
-        float margin = scores[j] - scores[y] + 1;
 
-        loss += std::max(0.f,margin);
+    // 1. Normalize scores for numerical stability
+    // Find max and subtract it from every score
+//    float max = *(std::max_element(scores.begin(), scores.end()));
+//    for(auto &a: scores) { a -= max; }
 
-        // Compute gradient
-        if( margin > 0 )
-        {
-            for (int d=0; d<D; ++d){
-                dW(y,d) -= image[d];
-                dW(j,d) += image[d];
-            }
+    // 2. Scores are unnormalized log probabilities
+    // we need to exp to get unnormalized probabilities
+    std::vector<double> unnormalized_prob(10,0);
+    for (int j=0; j<C; ++j){
+        unnormalized_prob[j] = std::exp(scores[j]);
+    }
+
+    // 3. Normalize to get probabilities
+    float normalizer = std::accumulate(unnormalized_prob.begin(), unnormalized_prob.end(), 0.0f);
+    std::vector<double> prob(10,0);
+    for (int j=0; j<C; ++j){
+        prob[j] = unnormalized_prob[j]/normalizer;
+    }
+
+    // 4. Compute loss
+    float loss = -std::log(prob[y]);
+
+    // Compute gradient
+    // Take derivative for scores
+    std::vector<double> dscores(prob);
+    dscores[y] -= 1;
+    // Propagate it to weights
+    // dW = x*dscores
+    for(int c=0; c<C; ++c){
+        for(int d=0; d<D; ++d){
+            dW(c,d) += image[d]*dscores[c];
         }
     }
 
     return loss;
 }
 
-float LinearSVM::loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to)
+float LinearSoftmax::loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to)
 {
     assert(images.size() == 50000);
     assert(C == 10);
     assert(D == 3073);
-
-    //std::cout << "From " << from << " to " << to << " size " << to-from << std::endl;
 
     // Reset gradient
     dW.fill(0.0);
@@ -103,7 +117,7 @@ float LinearSVM::loss(const std::vector< std::vector<float> > &images, const std
     return L;
 }
 
-int LinearSVM::inference(const std::vector<float> &image){
+int LinearSoftmax::inference(const std::vector<float> &image){
 
     std::vector<float> scores(10, 0);
 

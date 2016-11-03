@@ -1,5 +1,5 @@
-#ifndef LINEARSVM_H
-#define LINEARSVM_H
+#ifndef LINEARSOFTMAX_H
+#define LINEARSOFTMAX_H
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -9,10 +9,11 @@
 #include "CMatrix.h"
 #include "classifier.h"
 
-class LinearSVM : public Classifier
+class LinearSoftmax : public Classifier
 {
 public:
-    LinearSVM(int, int);
+    LinearSoftmax(int,int);
+
     void initializeW();
 
     /**
@@ -25,8 +26,6 @@ public:
     float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to);
 
     int inference(const std::vector<float> &image);
-
-
 };
 
-#endif // LINEARSVM_H
+#endif // LINEARSOFTMAX_H

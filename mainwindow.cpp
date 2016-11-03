@@ -4,13 +4,15 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    svm(10, 3073)
+    classifier(new LinearSVM(10, 3073))
 {
     ui->setupUi(this);
 
+    classifier->initializeW();
+
     // TODO: remove later
-    label_names.push_back("airplane");
-    label_names.push_back("automobile");
+    label_names.push_back("plane");
+    label_names.push_back("car");
     label_names.push_back("bird");
     label_names.push_back("cat");
     label_names.push_back("deer");
@@ -37,22 +39,43 @@ MainWindow::MainWindow(QWidget *parent) :
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
 
-        reader.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
     }
+
+    filters.clear();
+    filters << "test_batch.bin";
+    dir.setNameFilters(filters);
+    foreach(QFileInfo mitm, dir.entryInfoList()){
+        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+    }
+
     updateImage();
 
     visualizeWeights();
 
     // Ui init
-    ui->learningRateBox->setRange(0,1.0e-16);
-    ui->learningRateBox->setValue(svm.learning_rate);
+    // Learning rate
+    ui->learningRateBox->setRange(0,22);
+    ui->learningRateBox->setSingleStep(1);
+    ui->learningRateBox->setValue(abs(log10(classifier->learning_rate)));
+
+    // Epochs
+    ui->iterBox->setRange(1, 999);
     ui->iterBox->setValue(1);
+
+    // Batch size
+    ui->bsBox->setRange(1, 999);
+    ui->bsBox->setValue(100);
+
+    // Regularization
+    ui->regBox->setValue(classifier->lambda);
 
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete classifier;
 }
 
 void MainWindow::updateImage(){
@@ -60,18 +83,30 @@ void MainWindow::updateImage(){
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-        int red=reader.images_[index][y*32+x];
-        int green=reader.images_[index][1024+y*32+x];
-        int blue=reader.images_[index][2048+y*32+x];
+        int red=trainset.images_[index][y*32+x];
+        int green=trainset.images_[index][1024+y*32+x];
+        int blue=trainset.images_[index][2048+y*32+x];
         img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
-  img = img.scaledToWidth(ui->piclabel->width());
+  img = img.scaled(ui->piclabel->width(), ui->piclabel->height(), Qt::KeepAspectRatio);
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
-  ui->labelLineEdit->setText(QString::fromStdString(label_names[reader.labels_[index]]));
+  ui->labelLineEdit->setText(QString::fromStdString(label_names[trainset.labels_[index]]));
 
-  int predicted_label = svm.inference(reader.images_[index]);
-  ui->predictionLineEdit->setText(QString::fromStdString( label_names[reader.labels_[predicted_label]] ));
+  std::vector<float> scores = classifier->scores(trainset.images_[index]);
+  int predicted_label = classifier->inference(trainset.images_[index]);
+  ui->predictionLineEdit->setText(QString::fromStdString( label_names[predicted_label] ));
+
+  ui->labelPlaneScore->setText(QString::number( scores[0], 10, 5));
+  ui->labelCarScore->setText(QString::number(   scores[1], 10, 5));
+  ui->labelBirdScore->setText(QString::number(  scores[2], 10, 5));
+  ui->labelCatScore->setText(QString::number(   scores[3], 10, 5));
+  ui->labelDeerScore->setText(QString::number(  scores[4], 10, 5));
+  ui->labelDogScore->setText(QString::number(   scores[5], 10, 5));
+  ui->labelFrogScore->setText(QString::number(  scores[6], 10, 5));
+  ui->labelHorseScore->setText(QString::number( scores[7], 10, 5));
+  ui->labelShipScore->setText(QString::number(  scores[8], 10, 5));
+  ui->labelTruckScore->setText(QString::number( scores[9], 10, 5));
 }
 
 void MainWindow::on_actionOpen_dataset_triggered()
@@ -91,7 +126,7 @@ void MainWindow::on_actionOpen_dataset_triggered()
     dir.setNameFilters(filters);
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
-        reader.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
     }
     updateImage();
 }
@@ -122,7 +157,7 @@ void MainWindow::visualizeWeights(){
     QImage img8(32, 32, QImage::Format_RGB888);
     QImage img9(32, 32, QImage::Format_RGB888);
 
-    CMatrix<float> normW = svm.W;
+    CMatrix<float> normW = classifier->W;
     normW.normalize(0,255);
 
     weight2image(normW, 0, img0);
@@ -174,9 +209,9 @@ void MainWindow::visualizeWeights(){
 float MainWindow::evaluateAcc(){
     int correct = 0;
     int total = 0;
-    for(int i=5000; i<=6000; ++i){
-       int label = svm.inference(reader.images_[i]);
-       if(label == reader.labels_[i]) correct++;
+    for(int i=0; i<testset.images_.size(); ++i){
+       int label = classifier->inference(testset.images_[i]);
+       if(label == testset.labels_[i]) correct++;
        total++;
     }
 
@@ -186,12 +221,12 @@ float MainWindow::evaluateAcc(){
 void MainWindow::on_pushButton_clicked()
 {
     stopped_ = false;
-    int bs = 100;
+    int bs = ui->bsBox->value();
     int iters = 50000/bs;
     for(int epoch = 0; epoch < ui->iterBox->value(); epoch++){
 
         for(int i=0; i<iters; ++i){
-            float loss = svm.loss(reader.images_, reader.labels_, i*bs, i*bs + bs);
+            float loss = classifier->loss(trainset.images_, trainset.labels_, i*bs, i*bs + bs);
             ui->lossLabel->setText("Loss: " + QString::number(loss));
             visualizeWeights();
             updateImage();
@@ -219,6 +254,29 @@ void MainWindow::on_stopButton_clicked()
 
 void MainWindow::on_resetButton_clicked()
 {
-    svm.initializeW();
+    classifier->initializeW();
+    visualizeWeights();
+}
+
+void MainWindow::on_learningRateBox_valueChanged(int lr_exp)
+{
+    classifier->learning_rate = std::pow(10.f,-ui->learningRateBox->value());
+}
+
+void MainWindow::on_SVMRadioButton_clicked()
+{
+    gW = classifier->W;
+    delete classifier;
+    classifier = new LinearSVM(10, 3073);
+    classifier->copyW(gW);
+    visualizeWeights();
+}
+
+void MainWindow::on_SoftmaxRadioButton_clicked()
+{
+    gW = classifier->W;
+    delete classifier;
+    classifier = new LinearSoftmax(10, 3073);
+    classifier->copyW(gW);
     visualizeWeights();
 }
