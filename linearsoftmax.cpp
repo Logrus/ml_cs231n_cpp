@@ -47,8 +47,8 @@ float LinearSoftmax::loss_one_image(const std::vector<float> &image, const int &
 
     // 1. Normalize scores for numerical stability
     // Find max and subtract it from every score
-//    float max = *(std::max_element(scores.begin(), scores.end()));
-//    for(auto &a: scores) { a -= max; }
+    float max = *(std::max_element(scores.begin(), scores.end()));
+    for(auto &a: scores) { a -= max; }
 
     // 2. Scores are unnormalized log probabilities
     // we need to exp to get unnormalized probabilities
