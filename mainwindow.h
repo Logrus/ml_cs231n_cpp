@@ -30,6 +30,10 @@ private slots:
 
     void on_labelSpinBox_valueChanged(int arg1);
 
+    void on_stopButton_clicked();
+
+    void on_resetButton_clicked();
+
 private:
     void visualizeWeights();
     float evaluateAcc();
@@ -39,6 +43,8 @@ private:
     Ui::MainWindow *ui;
     CIFAR10Reader reader;
     LinearSVM svm;
+
+    bool stopped_ = false;
 };
 
 #endif // MAINWINDOW_H

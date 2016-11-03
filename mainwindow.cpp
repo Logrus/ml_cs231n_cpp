@@ -43,6 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     visualizeWeights();
 
+    // Ui init
+    ui->learningRateBox->setRange(0,1.0e-16);
+    ui->learningRateBox->setValue(svm.learning_rate);
+    ui->iterBox->setValue(1);
+
 }
 
 MainWindow::~MainWindow()
@@ -180,15 +185,18 @@ float MainWindow::evaluateAcc(){
 
 void MainWindow::on_pushButton_clicked()
 {
+    stopped_ = false;
     int bs = 100;
     int iters = 50000/bs;
-    for(int epoch = 0; epoch < 1; epoch++){
+    for(int epoch = 0; epoch < ui->iterBox->value(); epoch++){
 
         for(int i=0; i<iters; ++i){
             float loss = svm.loss(reader.images_, reader.labels_, i*bs, i*bs + bs);
             ui->lossLabel->setText("Loss: " + QString::number(loss));
             visualizeWeights();
+            updateImage();
             qApp->processEvents();
+            if(stopped_) return;
 
         }
 
@@ -202,4 +210,15 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_labelSpinBox_valueChanged(int arg1)
 {
     updateImage();
+}
+
+void MainWindow::on_stopButton_clicked()
+{
+    stopped_ = true;
+}
+
+void MainWindow::on_resetButton_clicked()
+{
+    svm.initializeW();
+    visualizeWeights();
 }

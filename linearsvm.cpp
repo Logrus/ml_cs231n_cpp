@@ -8,6 +8,13 @@ LinearSVM::LinearSVM(int classes, int dimentionality) :
     W.setSize(classes, dimentionality);
     dW.setSize(classes, dimentionality);
 
+    initializeW();
+
+    // Initialize gradient
+    dW.fill(0.0);
+
+}
+void LinearSVM::initializeW(){
     // Randomly initialize weights
     std::default_random_engine generator;
     std::normal_distribution<float> distribution(0,0.00001);
@@ -20,9 +27,6 @@ LinearSVM::LinearSVM(int classes, int dimentionality) :
             }
         }
     }
-
-    // Initialize gradient
-    dW.fill(0.0);
 }
 
 float LinearSVM::L2W_reg(){
@@ -55,24 +59,19 @@ float LinearSVM::loss_one_image(const std::vector<float> &image, const int &y){
     for (int j=0; j<C; ++j)
     {
         if(j==y) continue;
-        margins[j] = scores[j] - scores[y] + 1;
+        float margin = scores[j] - scores[y] + 1;
 
-        loss += std::max(0.f,margins[j]);
+        loss += std::max(0.f,margin);
 
-        counter += (margins[j]>0);
-
-    }
-
-    // Compute gradient
-    for (int j=0; j<C; ++j)
-        for (int d=0; d<D; ++d){
-            if(j==y){
-                dW(j,d) += -image[d]*counter;
-            } else {
-                dW(j,d) += (margins[j]>0)*image[d];
+        // Compute gradient
+        if( margin > 0 )
+        {
+            for (int d=0; d<D; ++d){
+                dW(y,d) -= image[d];
+                dW(j,d) += image[d];
             }
         }
-
+    }
 
     return loss;
 }
@@ -83,7 +82,7 @@ float LinearSVM::loss(const std::vector< std::vector<float> > &images, const std
     assert(C == 10);
     assert(D == 3073);
 
-    std::cout << "From " << from << " to " << to << " size " << to-from << std::endl;
+    //std::cout << "From " << from << " to " << to << " size " << to-from << std::endl;
 
     // Reset gradient
     dW.fill(0.0);
@@ -96,7 +95,6 @@ float LinearSVM::loss(const std::vector< std::vector<float> > &images, const std
     }
     L /= N;
     L += 0.5 * lambda * L2W_reg();
-    //std::cout << "Loss: " << L << std::endl;
 
     // Normalize and regularize gradient
     for (int x=0; x< dW.xSize(); ++x){

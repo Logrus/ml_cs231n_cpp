@@ -12,6 +12,7 @@ class LinearSVM
 {
 public:
     LinearSVM(int, int);
+    void initializeW();
 
     CMatrix<float> W;
     CMatrix<float> dW;
