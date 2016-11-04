@@ -4,21 +4,6 @@ LinearSVM::LinearSVM(int classes, int dimentionality) :
 {
 }
 
-void LinearSVM::initializeW(){
-    // Randomly initialize weights
-    std::default_random_engine generator;
-    std::normal_distribution<float> distribution(0,0.00001);
-    for(int x=0; x < W.xSize(); ++x){
-        for(int y=0; y < W.ySize(); ++y)
-        {
-            W(x,y) = distribution(generator);
-            if(y==W.ySize()-1){ //make the weight for bias positive (better for initialization)
-                W(x,y)=fabs(W(x,y));
-            }
-        }
-    }
-}
-
 float LinearSVM::L2W_reg(){
     float sum = 0;
     for (int x = 0; x < W.xSize(); ++x)

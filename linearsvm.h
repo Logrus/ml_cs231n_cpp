@@ -3,7 +3,6 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include <random>
 #include <algorithm>
 #include <assert.h>
 #include "CMatrix.h"
@@ -13,7 +12,6 @@ class LinearSVM : public Classifier
 {
 public:
     LinearSVM(int, int);
-    void initializeW();
 
     /**
      * @brief Computes SVM L2 regularization term W^2

@@ -30,3 +30,19 @@ std::vector<float> Classifier::scores(const std::vector<float> &image){
 
     return scores;
 }
+
+void Classifier::initializeW(){
+    // Randomly initialize weights
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
+    std::normal_distribution<float> distribution(0,0.00001);
+    for(int x=0; x < W.xSize(); ++x){
+        for(int y=0; y < W.ySize(); ++y)
+        {
+            W(x,y) = distribution(generator);
+            if(y==W.ySize()-1){ //make the weight for bias positive (better for initialization)
+                W(x,y)=fabs(W(x,y));
+            }
+        }
+    }
+}

@@ -49,10 +49,6 @@ MainWindow::MainWindow(QWidget *parent) :
         testset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
     }
 
-    updateImage();
-
-    visualizeWeights();
-
     // Ui init
     // Learning rate
     ui->learningRateBox->setRange(0,22);
@@ -64,12 +60,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->iterBox->setValue(1);
 
     // Batch size
-    ui->bsBox->setRange(1, 999);
+    ui->bsBox->setRange(1, 50000);
     ui->bsBox->setValue(100);
 
     // Regularization
+    ui->regBox->setDecimals(22);
+    ui->regBox->setSingleStep(0.00001);
     ui->regBox->setValue(classifier->lambda);
 
+    updateImage();
+
+    visualizeWeights();
 }
 
 MainWindow::~MainWindow()
@@ -122,12 +123,25 @@ void MainWindow::on_actionOpen_dataset_triggered()
 
     dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
     QStringList filters;
-    filters << "*.bin";
+    filters << "data_batch_1.bin";
+    filters << "data_batch_2.bin";
+    filters << "data_batch_3.bin";
+    filters << "data_batch_4.bin";
+    filters << "data_batch_5.bin";
     dir.setNameFilters(filters);
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
+
         trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
     }
+
+    filters.clear();
+    filters << "test_batch.bin";
+    dir.setNameFilters(filters);
+    foreach(QFileInfo mitm, dir.entryInfoList()){
+        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+    }
+
     updateImage();
 }
 

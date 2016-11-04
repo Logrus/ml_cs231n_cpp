@@ -1,6 +1,8 @@
 #ifndef CLASSIFIER_H
 #define CLASSIFIER_H
 #include "CMatrix.h"
+#include <chrono>
+#include <random>
 
 /**
  * @brief The Abstract Base Classifier class
@@ -11,14 +13,15 @@ public:
 
     Classifier(int classes, int dimentionality);
 
-    virtual void initializeW() = 0;
+    // Pure
     virtual float L2W_reg() = 0;
     virtual float loss_one_image(const std::vector<float> &image, const int &y) = 0;
     virtual float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to) = 0;
     virtual int inference(const std::vector<float> &image) = 0;
 
+    // Virtuals
+    virtual void initializeW();
     virtual void copyW(const CMatrix<float> W);
-
     virtual std::vector<float> scores(const std::vector<float> &image);
 
     CMatrix<float> W;
