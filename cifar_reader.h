@@ -12,8 +12,11 @@ public:
   std::vector< std::vector<float> > images_;
 
   // Data processing
-  // normalize()
-  // standardize()
+  void normalize();
+  void standardize();
   // mean_image
+
+private:
+  std::vector< std::vector<float> > images_copy_;
 };
 

@@ -43,6 +43,8 @@ private slots:
 
     void on_SoftmaxRadioButton_clicked();
 
+    void on_regBox_valueChanged(double arg1);
+
 private:
     void visualizeWeights();
     float evaluateAcc();

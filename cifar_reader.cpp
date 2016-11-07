@@ -36,5 +36,7 @@ bool CIFAR10Reader::read_bin(std::string filepath){
   }
   file.close();
   
+  images_copy_ = images_;
+
   return true;
 }

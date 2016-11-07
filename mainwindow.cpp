@@ -246,7 +246,10 @@ void MainWindow::on_pushButton_clicked()
             updateImage();
             qApp->processEvents();
             if(stopped_) return;
-
+            float Wmax = classifier->W.max();
+            float Wmin = classifier->W.min();
+            ui->labelWMax->setText("Max: " + QString::number(Wmax));
+            ui->labelWMin->setText("Min: " + QString::number(Wmin));
         }
 
         float acc = evaluateAcc();
@@ -275,6 +278,7 @@ void MainWindow::on_resetButton_clicked()
 void MainWindow::on_learningRateBox_valueChanged(int lr_exp)
 {
     classifier->learning_rate = std::pow(10.f,-ui->learningRateBox->value());
+    std::cout << "New learning rate value " << std::pow(10.f,-ui->learningRateBox->value()) << std::endl;
 }
 
 void MainWindow::on_SVMRadioButton_clicked()
@@ -293,4 +297,10 @@ void MainWindow::on_SoftmaxRadioButton_clicked()
     classifier = new LinearSoftmax(10, 3073);
     classifier->copyW(gW);
     visualizeWeights();
+}
+
+void MainWindow::on_regBox_valueChanged(double regularizer)
+{
+    classifier->lambda = regularizer;
+    std::cout << "New regularization value " << regularizer << std::endl;
 }

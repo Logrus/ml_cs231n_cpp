@@ -17,7 +17,7 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>160</x>
+      <x>140</x>
       <y>10</y>
       <width>80</width>
       <height>23</height>
@@ -137,36 +137,10 @@
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="lossLabel">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>40</y>
-      <width>261</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Loss:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="accLabel">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>70</y>
-      <width>261</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Accuracy:</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>250</x>
+      <x>230</x>
       <y>10</y>
       <width>80</width>
       <height>23</height>
@@ -179,7 +153,7 @@
    <widget class="QPushButton" name="resetButton">
     <property name="geometry">
      <rect>
-      <x>340</x>
+      <x>320</x>
       <y>10</y>
       <width>80</width>
       <height>23</height>
@@ -192,10 +166,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>110</y>
+      <x>140</x>
+      <y>90</y>
       <width>261</width>
-      <height>116</height>
+      <height>131</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -244,7 +218,7 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>440</x>
+      <x>410</x>
       <y>10</y>
       <width>102</width>
       <height>50</height>
@@ -530,6 +504,65 @@
      </item>
     </layout>
    </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>10</y>
+      <width>161</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Weight analysis</string>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_15">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_14">
+       <item>
+        <widget class="QLabel" name="labelWMax">
+         <property name="text">
+          <string>Max: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelWMin">
+         <property name="text">
+          <string>Min: </string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>40</y>
+      <width>261</width>
+      <height>36</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_13">
+     <item>
+      <widget class="QLabel" name="lossLabel">
+       <property name="text">
+        <string>Loss:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="accLabel">
+       <property name="text">
+        <string>Accuracy:</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
@@ -549,6 +582,9 @@
    <zorder>stopButton</zorder>
    <zorder>resetButton</zorder>
    <zorder>layoutWidget</zorder>
+   <zorder>labelWMax</zorder>
+   <zorder>labelWMin</zorder>
+   <zorder>groupBox</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
@@ -556,7 +592,7 @@
      <x>0</x>
      <y>0</y>
      <width>686</width>
-     <height>20</height>
+     <height>19</height>
     </rect>
    </property>
   </widget>
