@@ -24,6 +24,7 @@ public:
 
     int inference(const std::vector<float> &image);
 
+    std::vector<float> inference_loss(const std::vector<float> &image, const int &y);
 
 };
 

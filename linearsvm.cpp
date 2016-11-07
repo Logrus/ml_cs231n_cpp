@@ -101,3 +101,26 @@ int LinearSVM::inference(const std::vector<float> &image){
 
     return std::max_element(scores.begin(), scores.end()) - scores.begin();
 }
+
+std::vector<float> LinearSVM::inference_loss(const std::vector<float> &image, const int &y)
+{
+    std::vector<float> scores(10, 0);
+
+    // Compute scores
+    // scores = W*x
+    for(int c=0; c<C; ++c){
+        for(int d=0; d<D; ++d){
+            scores[c] += W(c,d)*image[d];
+        }
+    }
+
+    // Compute loss
+    std::vector<float> margins(10,0);
+    for (int j=0; j<C; ++j)
+    {
+        if(j==y) continue;
+        margins[j] = std::max(0.f, scores[j] - scores[y] + 1);
+    }
+
+    return margins;
+}

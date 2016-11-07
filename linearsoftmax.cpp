@@ -115,3 +115,38 @@ int LinearSoftmax::inference(const std::vector<float> &image){
 
     return std::max_element(scores.begin(), scores.end()) - scores.begin();
 }
+
+std::vector<float> LinearSoftmax::inference_loss(const std::vector<float> &image, const int &y)
+{
+    std::vector<float> scores(10, 0);
+
+    // Compute scores
+    // scores = W*x
+    for(int c=0; c<C; ++c){
+        for(int d=0; d<D; ++d){
+            scores[c] += W(c,d)*image[d];
+        }
+    }
+
+
+    // 1. Normalize scores for numerical stability
+    // Find max and subtract it from every score
+    float max = *(std::max_element(scores.begin(), scores.end()));
+    for(auto &a: scores) { a -= max; }
+
+    // 2. Scores are unnormalized log probabilities
+    // we need to exp to get unnormalized probabilities
+    std::vector<double> unnormalized_prob(10,0);
+    for (int j=0; j<C; ++j){
+        unnormalized_prob[j] = std::exp(scores[j]);
+    }
+
+    // 3. Normalize to get probabilities
+    float normalizer = std::accumulate(unnormalized_prob.begin(), unnormalized_prob.end(), 0.0f);
+    std::vector<float> prob(10,0);
+    for (int j=0; j<C; ++j){
+        prob[j] = unnormalized_prob[j]/normalizer;
+    }
+
+    return prob;
+}

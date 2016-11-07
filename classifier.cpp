@@ -31,6 +31,18 @@ std::vector<float> Classifier::scores(const std::vector<float> &image){
     return scores;
 }
 
+float Classifier::weight_ratio()
+{
+    long double weight = 0, update = 0;
+    for (int x = 0; x < W.xSize(); ++x){
+        for (int y = 0; y < W.ySize(); ++y){
+            weight += W(x,y) * W(x,y);
+            update += dW(x,y)*learning_rate * dW(x,y)*learning_rate;
+        }
+    }
+    return sqrt(update)/sqrt(weight);
+}
+
 void Classifier::initializeW(){
     // Randomly initialize weights
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();

@@ -108,6 +108,20 @@ void MainWindow::updateImage(){
   ui->labelHorseScore->setText(QString::number( scores[7], 10, 5));
   ui->labelShipScore->setText(QString::number(  scores[8], 10, 5));
   ui->labelTruckScore->setText(QString::number( scores[9], 10, 5));
+
+  // Evaluate loss vector
+  std::vector<float> loss_vec = classifier->inference_loss(trainset.images_[index], trainset.labels_[index]);
+  ui->labelPlaneLoss->setText(QString::number( loss_vec[0], 10, 5));
+  ui->labelCarLoss->setText(QString::number(   loss_vec[1], 10, 5));
+  ui->labelBirdLoss->setText(QString::number(  loss_vec[2], 10, 5));
+  ui->labelCatLoss->setText(QString::number(   loss_vec[3], 10, 5));
+  ui->labelDeerLoss->setText(QString::number(  loss_vec[4], 10, 5));
+  ui->labelDogLoss->setText(QString::number(   loss_vec[5], 10, 5));
+  ui->labelFrogLoss->setText(QString::number(  loss_vec[6], 10, 5));
+  ui->labelHorseLoss->setText(QString::number( loss_vec[7], 10, 5));
+  ui->labelShipLoss->setText(QString::number(  loss_vec[8], 10, 5));
+  ui->labelTruckLoss->setText(QString::number( loss_vec[9], 10, 5));
+
 }
 
 void MainWindow::on_actionOpen_dataset_triggered()
@@ -248,8 +262,19 @@ void MainWindow::on_pushButton_clicked()
             if(stopped_) return;
             float Wmax = classifier->W.max();
             float Wmin = classifier->W.min();
-            ui->labelWMax->setText("Max: " + QString::number(Wmax));
-            ui->labelWMin->setText("Min: " + QString::number(Wmin));
+            ui->labelWMax->setText("WMax: " + QString::number(Wmax));
+            ui->labelWMin->setText("WMin: " + QString::number(Wmin));
+
+            float dWmax = classifier->dW.max();
+            float dWmin = classifier->dW.min();
+            ui->labeldWMax->setText("dWMax: " + QString::number(dWmax));
+            ui->labeldWMin->setText("dWMin: " + QString::number(dWmin));
+
+            ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax*classifier->learning_rate));
+            ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin*classifier->learning_rate));
+
+            ui->labelRatio->setText("Ratio: " + QString::number(classifier->weight_ratio()));
+
         }
 
         float acc = evaluateAcc();
@@ -303,4 +328,81 @@ void MainWindow::on_regBox_valueChanged(double regularizer)
 {
     classifier->lambda = regularizer;
     std::cout << "New regularization value " << regularizer << std::endl;
+}
+
+void MainWindow::on_buttonMeanImage_clicked()
+{
+    trainset.demean();
+
+    // Show mean image
+    QImage img(32, 32, QImage::Format_RGB888);
+    for (int x = 0; x < 32; ++x) {
+      for (int y = 0; y < 32; ++y) {
+          int red=trainset.mean_image[y*32+x];
+          int green=trainset.mean_image[1024+y*32+x];
+          int blue=trainset.mean_image[2048+y*32+x];
+          img.setPixel(x, y, qRgb(red, green, blue));
+      }
+    }
+
+    img = img.scaled(ui->labelMeanImage->width(), ui->labelMeanImage->height(), Qt::KeepAspectRatio);
+    ui->labelMeanImage->setPixmap(QPixmap::fromImage(img));
+
+    auto minmax = trainset.minmax();
+    ui->dataMin->setText("Min: " + QString::number( minmax.first ));
+    ui->dataMax->setText("Max: " + QString::number( minmax.second ));
+
+}
+
+void MainWindow::on_buttonNormalizationReset_clicked()
+{
+    trainset.reset();
+    auto minmax = trainset.minmax();
+    ui->dataMin->setText("Min: " + QString::number( minmax.first ));
+    ui->dataMax->setText("Max: " + QString::number( minmax.second ));
+}
+
+void MainWindow::on_buttonStandardize_clicked()
+{
+    trainset.standardize();
+    // Show mean image
+    QImage img(32, 32, QImage::Format_RGB888);
+    for (int x = 0; x < 32; ++x) {
+      for (int y = 0; y < 32; ++y) {
+          int red=trainset.mean_image[y*32+x];
+          int green=trainset.mean_image[1024+y*32+x];
+          int blue=trainset.mean_image[2048+y*32+x];
+          img.setPixel(x, y, qRgb(red, green, blue));
+      }
+    }
+
+    img = img.scaled(ui->labelMeanImage->width(), ui->labelMeanImage->height(), Qt::KeepAspectRatio);
+    ui->labelMeanImage->setPixmap(QPixmap::fromImage(img));
+
+    // Show std image
+    QImage img2(32, 32, QImage::Format_RGB888);
+    for (int x = 0; x < 32; ++x) {
+      for (int y = 0; y < 32; ++y) {
+          int red=trainset.std_image[y*32+x];
+          int green=trainset.std_image[1024+y*32+x];
+          int blue=trainset.std_image[2048+y*32+x];
+          img2.setPixel(x, y, qRgb(red, green, blue));
+      }
+    }
+
+    img2 = img2.scaled(ui->stdImage->width(), ui->stdImage->height(), Qt::KeepAspectRatio);
+    ui->stdImage->setPixmap(QPixmap::fromImage(img2));
+
+    auto minmax = trainset.minmax();
+    ui->dataMin->setText("Min: " + QString::number( minmax.first ));
+    ui->dataMax->setText("Max: " + QString::number( minmax.second ));
+
+}
+
+void MainWindow::on_buttonNormalize_clicked()
+{
+    trainset.normalize();
+    auto minmax = trainset.minmax();
+    ui->dataMin->setText("Min: " + QString::number( minmax.first ));
+    ui->dataMax->setText("Max: " + QString::number( minmax.second ));
 }

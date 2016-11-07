@@ -45,6 +45,14 @@ private slots:
 
     void on_regBox_valueChanged(double arg1);
 
+    void on_buttonMeanImage_clicked();
+
+    void on_buttonNormalizationReset_clicked();
+
+    void on_buttonStandardize_clicked();
+
+    void on_buttonNormalize_clicked();
+
 private:
     void visualizeWeights();
     float evaluateAcc();

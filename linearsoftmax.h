@@ -23,6 +23,9 @@ public:
     float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to);
 
     int inference(const std::vector<float> &image);
+
+    std::vector<float> inference_loss(const std::vector<float> &image, const int &y);
+
 };
 
 #endif // LINEARSOFTMAX_H
