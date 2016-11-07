@@ -333,6 +333,7 @@ void MainWindow::on_regBox_valueChanged(double regularizer)
 void MainWindow::on_buttonMeanImage_clicked()
 {
     trainset.demean();
+    testset.demean();
 
     // Show mean image
     QImage img(32, 32, QImage::Format_RGB888);
@@ -357,6 +358,7 @@ void MainWindow::on_buttonMeanImage_clicked()
 void MainWindow::on_buttonNormalizationReset_clicked()
 {
     trainset.reset();
+    testset.reset();
     auto minmax = trainset.minmax();
     ui->dataMin->setText("Min: " + QString::number( minmax.first ));
     ui->dataMax->setText("Max: " + QString::number( minmax.second ));
@@ -365,6 +367,8 @@ void MainWindow::on_buttonNormalizationReset_clicked()
 void MainWindow::on_buttonStandardize_clicked()
 {
     trainset.standardize();
+    testset.standardize();
+
     // Show mean image
     QImage img(32, 32, QImage::Format_RGB888);
     for (int x = 0; x < 32; ++x) {
@@ -402,6 +406,7 @@ void MainWindow::on_buttonStandardize_clicked()
 void MainWindow::on_buttonNormalize_clicked()
 {
     trainset.normalize();
+    testset.normalize();
     auto minmax = trainset.minmax();
     ui->dataMin->setText("Min: " + QString::number( minmax.first ));
     ui->dataMax->setText("Max: " + QString::number( minmax.second ));

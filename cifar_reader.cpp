@@ -47,8 +47,8 @@ void CIFAR10Reader::compute_mean()
     // Compute mean image
     mean_image.resize(images_copy_[0].size());
     std::fill(mean_image.begin(), mean_image.end(), 0.0f);
-    for(int i=0; i < images_copy_.size(); ++i){
-        const std::vector<float> *image = &images_copy_[i];
+    for(int i=0; i < images_.size(); ++i){
+        const std::vector<float> *image = &images_[i];
         for(int d=0; d < image->size(); ++d){
             mean_image[d] += image->at(d);
         }
@@ -65,14 +65,15 @@ void CIFAR10Reader::compute_std()
     // Compute mean image
     std_image.resize(images_copy_[0].size());
     std::fill(std_image.begin(), std_image.end(), 0.0f);
-    for(int i=0; i < images_copy_.size(); ++i){
-        const std::vector<float> *image = &images_copy_[i];
+    for(int i=0; i < images_.size(); ++i){
+        const std::vector<float> *image = &images_[i];
         for(int d=0; d < image->size(); ++d){
-            std_image[d] += (image->at(d) - mean_image[d])*(image->at(d) - mean_image[d]);
+            float diff = (image->at(d) - mean_image[d]);
+            std_image[d] += diff*diff;
         }
     }
-    for(int d=0; d < mean_image.size(); ++d){
-        std_image[d] = sqrt( std_image[d]/images_copy_.size() );
+    for(int d=0; d < std_image.size(); ++d){
+        std_image[d] = sqrt( std_image[d] /images_.size() ) ;
     }
 }
 
@@ -92,12 +93,18 @@ void CIFAR10Reader::standardize()
 {
     compute_mean();
     compute_std();
-    for(int i=0; i < images_copy_.size(); ++i){
-        std::vector<float> *image = &images_[i];
-        for(int d=0; d < image->size(); ++d){
-            image->at(d) = (image->at(d) - mean_image[d])/std_image[d];
+    float max = -100;
+    float min = 100;
+    for(int i=0; i < images_.size(); ++i){
+//        std::vector<float> *image = &images_[i];
+        for(int d=0; d < images_[0].size(); ++d){
+            images_[i][d] -= mean_image[d];
+            images_[i][d] /= std_image[d];
+            if (max < images_[i][d]) max = images_[i][d];
+            if (min > images_[i][d]) min = images_[i][d];
         }
     }
+    std::cout << "Max! " << max <<  " min " << min << std::endl;
 }
 
 void CIFAR10Reader::demean()
