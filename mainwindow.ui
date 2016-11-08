@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>923</width>
+    <width>816</width>
     <height>451</height>
    </rect>
   </property>
@@ -378,12 +378,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>590</x>
       <y>130</y>
-      <width>141</width>
+      <width>91</width>
       <height>51</height>
      </rect>
     </property>
@@ -404,10 +404,10 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>770</x>
+      <x>700</x>
       <y>10</y>
       <width>101</width>
       <height>211</height>
@@ -430,7 +430,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -700,29 +700,18 @@
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
-   <zorder>layoutWidget</zorder>
    <zorder>pushButton</zorder>
    <zorder>stopButton</zorder>
    <zorder>resetButton</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>groupBox</zorder>
-   <zorder>labelMeanImage</zorder>
-   <zorder>stdImage</zorder>
-   <zorder>dataMin</zorder>
-   <zorder>dataMax</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>923</width>
+     <width>816</width>
      <height>19</height>
     </rect>
    </property>

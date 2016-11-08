@@ -332,7 +332,11 @@ void MainWindow::on_regBox_valueChanged(double regularizer)
 
 void MainWindow::on_buttonMeanImage_clicked()
 {
+    // Demean test set
+    trainset.compute_mean();
     trainset.demean();
+    // Demean training set
+    testset.mean_image = trainset.mean_image;
     testset.demean();
 
     // Show mean image
@@ -366,7 +370,13 @@ void MainWindow::on_buttonNormalizationReset_clicked()
 
 void MainWindow::on_buttonStandardize_clicked()
 {
+    // Standardize trainset
+    trainset.compute_mean();
+    trainset.compute_std();
     trainset.standardize();
+    // Standardize testset
+    testset.mean_image = trainset.mean_image;
+    testset.std_image = trainset.std_image;
     testset.standardize();
 
     // Show mean image
@@ -396,6 +406,7 @@ void MainWindow::on_buttonStandardize_clicked()
 
     img2 = img2.scaled(ui->stdImage->width(), ui->stdImage->height(), Qt::KeepAspectRatio);
     ui->stdImage->setPixmap(QPixmap::fromImage(img2));
+
 
     auto minmax = trainset.minmax();
     ui->dataMin->setText("Min: " + QString::number( minmax.first ));

@@ -73,7 +73,7 @@ void CIFAR10Reader::compute_std()
         }
     }
     for(int d=0; d < std_image.size(); ++d){
-        std_image[d] = sqrt( std_image[d] /images_.size() ) ;
+        std_image[d] = sqrtf( std_image[d] /images_.size() ) ;
     }
 }
 
@@ -91,15 +91,15 @@ void CIFAR10Reader::normalize()
 
 void CIFAR10Reader::standardize()
 {
-    compute_mean();
-    compute_std();
+    //compute_mean();
+    //compute_std();
     float max = -100;
     float min = 100;
     for(int i=0; i < images_.size(); ++i){
 //        std::vector<float> *image = &images_[i];
         for(int d=0; d < images_[0].size(); ++d){
             images_[i][d] -= mean_image[d];
-            images_[i][d] /= std_image[d];
+            images_[i][d] /= std_image[d] + 0.0001;
             if (max < images_[i][d]) max = images_[i][d];
             if (min > images_[i][d]) min = images_[i][d];
         }
@@ -109,7 +109,7 @@ void CIFAR10Reader::standardize()
 
 void CIFAR10Reader::demean()
 {
-    compute_mean();
+    //compute_mean();
 
     // Demean every image
     for(int i=0; i< images_.size(); ++i){
