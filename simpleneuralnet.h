@@ -11,6 +11,7 @@ public:
     SimpleNeuralNet(int input_size, int hidden_size, int output_size, float std);
 
     float loss(const vvfloat &images, const vint &labels);
+
 };
 
 #endif // SIMPLENEURALNET_H
