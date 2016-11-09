@@ -39,14 +39,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
 
-        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
     }
 
     filters.clear();
     filters << "test_batch.bin";
     dir.setNameFilters(filters);
     foreach(QFileInfo mitm, dir.entryInfoList()){
-        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
     }
 
     // Ui init
@@ -146,14 +146,14 @@ void MainWindow::on_actionOpen_dataset_triggered()
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
 
-        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
     }
 
     filters.clear();
     filters << "test_batch.bin";
     dir.setNameFilters(filters);
     foreach(QFileInfo mitm, dir.entryInfoList()){
-        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData());
+        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
     }
 
     updateImage();

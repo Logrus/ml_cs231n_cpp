@@ -5,10 +5,12 @@
 #include <fstream>
 #include <algorithm>
 #include <tuple>
+#include <set>
+#include "fisheryatesshuffle.h"
 
 class CIFAR10Reader {
 public:
-  bool read_bin(std::string filepath);
+  bool read_bin(std::string filepath, bool bias_trick);
   
   std::vector<int> labels_;
   std::vector< std::vector<float> > images_;
@@ -25,7 +27,10 @@ public:
 
   std::pair<float, float> minmax();
 
+  std::vector<int> get_batch_idxs(int batch_size);
+
 private:
+  FisherYatesShuffle shuffler;
   std::vector< std::vector<float> > images_copy_;
 };
 

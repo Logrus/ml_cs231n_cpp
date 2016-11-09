@@ -1,6 +1,6 @@
 #include "cifar_reader.h"
 
-bool CIFAR10Reader::read_bin(std::string filepath){
+bool CIFAR10Reader::read_bin(std::string filepath, bool bias_trick = false){
   
   std::cout << "Reading " << filepath << std::endl;
 
@@ -35,6 +35,8 @@ bool CIFAR10Reader::read_bin(std::string filepath){
       images_.push_back(picture);
   }
   file.close();
+
+  shuffler.set_nelem(images_.size());
   
   images_copy_ = images_;
 
@@ -140,4 +142,9 @@ std::pair<float, float> CIFAR10Reader::minmax()
     }
 
     return {gmin, gmax};
+}
+
+std::vector<int> CIFAR10Reader::get_batch_idxs(int batch_size)
+{
+    return shuffler.get_random_indexies(batch_size);
 }

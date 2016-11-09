@@ -1,6 +1,6 @@
 #ifndef SIMPLENEURALNET_H
 #define SIMPLENEURALNET_H
-
+#include <vector>
 
 typedef std::vector< std::vector<float> > vvfloat;
 typedef std::vector<int> vint;
