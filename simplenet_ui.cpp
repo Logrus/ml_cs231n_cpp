@@ -4,7 +4,7 @@
 SimpleNetUI::SimpleNetUI(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::SimpleNetUI),
-    classifier(new SimpleNeuralNet(3072, 50, 10, 0.0000001))
+    classifier(new SimpleNeuralNet(3072, 70, 10, 0.0001))
 {
     ui->setupUi(this);
 
@@ -248,7 +248,6 @@ float SimpleNetUI::evaluateAcc(){
 
 void SimpleNetUI::on_pushButton_clicked()
 {
-    //classifier->initializeW();
     stopped_ = false;
     int bs = ui->bsBox->value();
     int iters = trainset.images_.size()/bs;
@@ -263,18 +262,18 @@ void SimpleNetUI::on_pushButton_clicked()
             //updateImage();
             qApp->processEvents();
             if(stopped_) return;
-//            float Wmax = classifier->W1.max();
-//            float Wmin = classifier->W1.min();
-//            ui->labelWMax->setText("WMax: " + QString::number(Wmax));
-//            ui->labelWMin->setText("WMin: " + QString::number(Wmin));
+            float Wmax = classifier->W1.max();
+            float Wmin = classifier->W1.min();
+            ui->labelWMax->setText("WMax: " + QString::number(Wmax));
+            ui->labelWMin->setText("WMin: " + QString::number(Wmin));
 
-//            float dWmax = classifier->dW1.max();
-//            float dWmin = classifier->dW1.min();
-//            ui->labeldWMax->setText("dWMax: " + QString::number(dWmax));
-//            ui->labeldWMin->setText("dWMin: " + QString::number(dWmin));
+            float dWmax = classifier->dW1.max();
+            float dWmin = classifier->dW1.min();
+            ui->labeldWMax->setText("dWMax: " + QString::number(dWmax));
+            ui->labeldWMin->setText("dWMin: " + QString::number(dWmin));
 
-//            ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax*classifier->learning_rate));
-//            ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin*classifier->learning_rate));
+            ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax*classifier->learning_rate));
+            ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin*classifier->learning_rate));
 
             //ui->labelRatio->setText("Ratio: " + QString::number(classifier->weight_ratio()));
 
