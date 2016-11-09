@@ -4,23 +4,23 @@ SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size, int output_siz
     input_size_(input_size), hidden_size_(hidden_size), output_size_(output_size), std_(std)
 {
     // Initialize hyperparameters
-    learning_rate = 1.e-10;
-    lambda = 5.e-3;
+    learning_rate = 1e-4;
+    lambda = 0.5;
+    initializeW();
 }
 
 float SimpleNeuralNet::loss(const vvfloat &images, const vint &labels, const vint &batch_idx)
 {
     // Reset gradience between batches
     dW1.fill(0.f);
-    db1.fill(0.f);
     dW2.fill(0.f);
-    db2.fill(0.f);
+    std::fill(db1.begin(), db1.end(), 0.f);
+    std::fill(db2.begin(), db2.end(), 0.f);
 
     // ************************
     //  Compute loss for batch
     // ************************
     int N = batch_idx.size(); // Batch size
-    std::cout << "Batch size " << N << std::endl; std::cin.get();
     float L = 0; // Accumulated loss for the batch
     for(int i=0; i<N; ++i){
         L += loss_one_image(images[batch_idx[i]], labels[batch_idx[i]]);
@@ -39,8 +39,8 @@ float SimpleNeuralNet::loss(const vvfloat &images, const vint &labels, const vin
             W2_reg += W2(s, h) * W2(s, h);
         }
     }
+
     L +=  0.5 * lambda * W1_reg +  0.5 * lambda * W2_reg;
-    std::cout << "Loss for one batch " << L << std::endl; std::cin.get();
 
     // Add gradient regularization
     for(int s=0; s<output_size_; ++s){
@@ -55,34 +55,32 @@ float SimpleNeuralNet::loss(const vvfloat &images, const vint &labels, const vin
     }
 
     for(int i=0; i<db2.size(); ++i){
-        db2(i,1) /= static_cast<float>(N);
+        db2[i] /= static_cast<float>(N);
     }
 
     for(int i=0; i<db1.size(); ++i){
-        db1(i,1) /= static_cast<float>(N);
+        db1[i] /= static_cast<float>(N);
     }
 
     // **********************
     //  Update weights
     // **********************
-//    for(int s=0; s<output_size_; ++s){
-//        for(int h=0; h<hidden_size_; ++h){
-//            W2(s,h) -= learning_rate * dW2(s, h);
-//        }
-//    }
-
-//    for(int i=0; i<b2.size(); ++i){
-//        b2(i,1) -= learning_rate*db2(i,1);
-//    }
-//    for(int i=0; i<input_size_; ++i){
-//        for(int h=0; h<hidden_size_; ++h){
-//            W1(h,i) -= learning_rate * dW1(h, i);
-//        }
-//    }
-
-//    for(int i=0; i<b1.size(); ++i){
-//        b1(i,1) -= learning_rate*db1(i,1);
-//    }
+    for(int s=0; s<output_size_; ++s){
+        for(int h=0; h<hidden_size_; ++h){
+            W2(s,h) -= learning_rate*dW2(s, h);
+        }
+    }
+    for(int i=0; i<b2.size(); ++i){
+        b2[i] -= learning_rate*db2[i];
+    }
+    for(int i=0; i<input_size_; ++i){
+        for(int h=0; h<hidden_size_; ++h){
+            W1(h,i) -= learning_rate*dW1(h, i);
+        }
+    }
+    for(int i=0; i<b1.size(); ++i){
+        b1[i] -= learning_rate*db1[i];
+    }
 
     return L;
 }
@@ -90,27 +88,16 @@ float SimpleNeuralNet::loss(const vvfloat &images, const vint &labels, const vin
 
 float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int &y){
 
-    assert(image.size() == 3072);
-
     // **********************
     //  Compute forward pass
     // **********************
     // H = W1*x + b1
-    std::vector<float> H (hidden_size_, 0);
-
+    std::vector<float> H (hidden_size_);
     for(int h=0; h < hidden_size_; ++h){
         for(int i=0; i < input_size_; ++i) {
-            H[h] += W1(h, i) * image[i] + b1(h,1);
+            H[h] += W1(h, i)*image[i] + b1[h];
         }
-        //std::cout << H[h] << " ";  std::cin.get();
     }
-    //std::cout << std::endl;
-
-    std::cout << "H: " << std::endl;
-    for(int i=0; i<H.size(); ++i){
-        std::cout << H[i] << " ";
-    }
-    std::cin.get();
 
     // ReLu and it's derivative
     std::vector<float> dmax (hidden_size_, 1.f);
@@ -121,42 +108,13 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
         }
     }
 
-//    std::cout << "H: " << std::endl;
-//    for(int i=0; i<H.size(); ++i){
-//        std::cout << H[i] << " ";
-//    }
-//    std::cin.get();
-
-
     // S = W2*H + b2
-    std::vector<float> S(output_size_, 0);
+    std::fill(S.begin(), S.end(), 0.f);
     for(int s=0; s < output_size_; ++s){
         for(int h=0; h < hidden_size_; ++h) {
-            S[s] += W2(s, h) * H[h] + b2(s,1);
+            S[s] += W2(s, h)*H[h] + b2[s];
         }
     }
-
-//    std::cout << "W2: " << std::endl;
-//    for(int i=0; i<W2.xSize(); ++i){
-//        for(int j=0; j<W2.ySize(); ++j){
-//            std::cout << W2(i,j) << " ";
-//        }
-//    }
-//    std::cin.get();
-
-//    std::cout << "b2: " << std::endl;
-//    for(int i=0; i< b2.xSize(); ++i){
-//        for(int j=0; j<b2.ySize(); ++j){
-//            std::cout << b2(i,j) << " ";
-//        }
-//    }
-//    std::cin.get();
-
-//    std::cout << "S: " << std::endl;
-//    for(int i=0; i<S.size(); ++i){
-//        std::cout << S[i] << " ";
-//    }
-//    std::cin.get();
 
     // ***********************
     //  Compute loss function
@@ -164,12 +122,13 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
 
     // Subtract from scores max to make our computations
     // numerically stable
-    float max = *std::max_element(S.begin(), S.end());
-    for(auto &a : S) a -= max;
+    std::vector<float> nscores(S);
+    float max = *std::max_element(nscores.begin(), nscores.end());
+    for(auto &a : nscores) a -= max;
 
     // Our data is unnormalized log probabilities
     // Exponentiate it
-    std::vector<float> power(S);
+    std::vector<float> power(nscores);
     for(auto &a : power){
         a = std::exp(a);
     }
@@ -182,8 +141,6 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
     }
 
     float loss = -log( prob[y] );
-    std::cout << "Loss for one image " << loss << std::endl;
-    assert( loss < 3.f );
 
     // ***********************
     //  Compute backward pass
@@ -203,7 +160,7 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
     // Propagate it into b2
     // db2 = 1*dscores
     for(int s=0; s<output_size_; ++s){
-        db2(s, 1) += prob[s];
+        db2[s] += prob[s];
     }
 
     // Propagate gradient further through nonlinearity
@@ -214,11 +171,6 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
             dhidden[h] += W2(s, h)*prob[s]*dmax[h];
         }
     }
-//    std::cout << "dhidden: " << std::endl;
-//    for(int i=0; i<dhidden.size(); ++i){
-//        std::cout << dhidden[i] << " ";
-//    }
-//    std::cin.get();
 
 
     // Propagate into W1
@@ -230,7 +182,7 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
 
     // Propagate into b1
     for(int h=0; h<hidden_size_; ++h){
-        db1(h, 1) += dhidden[h];
+        db1[h] += dhidden[h];
     }
 
 
@@ -239,27 +191,38 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
 
 int SimpleNeuralNet::inference(const std::vector<float> &image)
 {
+    std::vector<float> scores = inference_scores(image);
+
+    return std::max_element(scores.begin(), scores.end()) - scores.begin();
+}
+
+std::vector<float> SimpleNeuralNet::inference_scores(const std::vector<float> &image)
+{
     // **********************
     //  Compute forward pass
     // **********************
     // H = W1*x + b1
     std::vector<float> H (hidden_size_);
-    std::vector<float> dmax (hidden_size_, 1);
     for(int h=0; h < hidden_size_; ++h){
         for(int i=0; i < input_size_; ++i) {
-            H[h] += std::max(0.f, W1(h, i) * image[i] + b1(h,1) );
+            H[h] += W1(h, i)*image[i] + b1[h];
         }
+    }
+
+    // ReLU
+    for(int h=0; h < hidden_size_; ++h){
+        H[h] = std::max(0.f, H[h]);
     }
 
     // S = W2*H + b2
-    std::vector<float> S(output_size_);
+    std::fill(S.begin(), S.end(), 0.f);
     for(int s=0; s < output_size_; ++s){
         for(int h=0; h < hidden_size_; ++h) {
-            S[s] += W2(s, h) * H[h] + b2(s,1);
+            S[s] += W2(s, h)*H[h] + b2[s];
         }
     }
 
-    return std::max_element(S.begin(), S.end()) - S.begin();
+    return S;
 }
 
 void SimpleNeuralNet::initializeW()
@@ -271,8 +234,8 @@ void SimpleNeuralNet::initializeW()
 
     // Initialize weights and biases
     W1.setSize(hidden_size_, input_size_);
-    b1.setSize(hidden_size_, 1);
-    b1.fill(0.001);
+    b1.resize(hidden_size_);
+    std::fill(b1.begin(), b1.end(), 0.001);
 
     // Random init of W1
     for(int x=0; x < W1.xSize(); ++x){
@@ -283,8 +246,8 @@ void SimpleNeuralNet::initializeW()
     }
 
     W2.setSize(output_size_, hidden_size_);
-    b2.setSize(output_size_, 1);
-    b2.fill(0.001);
+    b2.resize(output_size_);
+    std::fill(b2.begin(), b2.end(), 0.001);
 
     // Random init of W2
     for(int x=0; x < W2.xSize(); ++x){
@@ -296,11 +259,15 @@ void SimpleNeuralNet::initializeW()
 
     // Initialize gradients
     dW1.setSize(hidden_size_, input_size_);
-    db1.setSize(hidden_size_, 1);
     dW2.setSize(output_size_, hidden_size_);
-    db2.setSize(output_size_ ,1);
     dW1.fill(0.f);
-    db1.fill(0.f);
     dW2.fill(0.f);
-    db2.fill(0.f);
+
+    db1.resize(hidden_size_);
+    db2.resize(output_size_);
+    std::fill(db1.begin(), db1.end(), 0.f);
+    std::fill(db2.begin(), db2.end(), 0.f);
+
+    // Initialize score
+    S.resize(output_size_);
 }

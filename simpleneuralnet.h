@@ -30,15 +30,24 @@ public:
 
     int inference(const std::vector<float> &image);
 
+    std::vector<float> inference_scores(const std::vector<float> &image);
+
     void initializeW();
 
     // Weights
-    CMatrix<float> W1, b1;
-    CMatrix<float> W2, b2;
+    CMatrix<float> W1;
+    CMatrix<float> W2;
+
+    std::vector<float> b1, b2;
 
     // Gradients
-    CMatrix<float> dW1, db1;
-    CMatrix<float> dW2, db2;
+    CMatrix<float> dW1;
+    CMatrix<float> dW2;
+
+    std::vector<float> db1, db2;
+
+    // Scores
+    std::vector<float> S;
 };
 
 #endif // SIMPLENEURALNET_H

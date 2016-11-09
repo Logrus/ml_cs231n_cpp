@@ -68,3 +68,4 @@ add_executable(simple_net ${net_SOURCES} ${net_HEADERS_MOC} ${net_FORMS_HEADERS}
 target_link_libraries (simple_net ${QT_LIBRARIES})
 
 add_executable(test_fisheryatesshuffle test_fisheryatesshuffle.cpp fisheryatesshuffle.cpp)
+add_executable(test_simpleneuralnetwork test_simpleneuralnetwork.cpp simpleneuralnet.cpp)
