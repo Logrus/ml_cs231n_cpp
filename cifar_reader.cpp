@@ -31,7 +31,9 @@ bool CIFAR10Reader::read_bin(std::string filepath, bool bias_trick = false){
               }
           }
       }
-      picture.push_back(1); // Bias trick
+      if(bias_trick){
+          picture.push_back(1); // Bias trick
+      }
       images_.push_back(picture);
   }
   file.close();

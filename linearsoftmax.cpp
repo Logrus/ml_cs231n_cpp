@@ -67,7 +67,7 @@ float LinearSoftmax::loss_one_image(const std::vector<float> &image, const int &
     return loss;
 }
 
-float LinearSoftmax::loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to)
+float LinearSoftmax::loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, const std::vector<int> &indexies)
 {
     assert(images.size() == 50000);
     assert(C == 10);
@@ -78,9 +78,9 @@ float LinearSoftmax::loss(const std::vector< std::vector<float> > &images, const
 
     // Compute loss for all images
     float L = 0;
-    int N = to-from; // N images in batch
-    for(int i=from; i<to; ++i){
-        L += loss_one_image(images[i], labels[i]);
+    int N = indexies.size(); // N images in batch
+    for(int i=0; i<N; ++i){
+        L += loss_one_image(images[indexies[i]], labels[indexies[i]]);
     }
     L /= N;
     L += 0.5 * lambda * L2W_reg();

@@ -49,4 +49,22 @@ add_executable  (${PROJECT_NAME} ${project_SOURCES}
 
 target_link_libraries (${PROJECT_NAME} ${QT_LIBRARIES})
 
+# Additional targets
+set(net_SOURCES simplenet_main.cpp
+                simplenet_ui.cpp
+                simpleneuralnet.cpp
+                cifar_reader.cpp
+                fisheryatesshuffle.cpp)
+set(net_HEADERS simplenet_ui.h
+                simpleneuralnet.h
+                cifar_reader.h
+                fisheryatesshuffle.h)
+set(net_FORMS   simplenet_ui.ui)
+
+QT4_WRAP_CPP (net_HEADERS_MOC   ${net_HEADERS})
+QT4_WRAP_UI  (net_FORMS_HEADERS ${net_FORMS})
+
+add_executable(simple_net ${net_SOURCES} ${net_HEADERS_MOC} ${net_FORMS_HEADERS})
+target_link_libraries (simple_net ${QT_LIBRARIES})
+
 add_executable(test_fisheryatesshuffle test_fisheryatesshuffle.cpp fisheryatesshuffle.cpp)

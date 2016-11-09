@@ -16,7 +16,7 @@ public:
     // Pure virtuals
     virtual float L2W_reg() = 0;
     virtual float loss_one_image(const std::vector<float> &image, const int &y) = 0;
-    virtual float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to) = 0;
+    virtual float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, const std::vector<int> &indexies) = 0;
     virtual int inference(const std::vector<float> &image) = 0;
     virtual std::vector<float> inference_loss(const std::vector<float> &image, const int &y) = 0;
 

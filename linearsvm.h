@@ -20,7 +20,7 @@ public:
     float L2W_reg();
 
     float loss_one_image(const std::vector<float> &image, const int &y);
-    float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, int from, int to);
+    float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, const std::vector<int> &indexies);
 
     int inference(const std::vector<float> &image);
 

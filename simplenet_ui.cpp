@@ -1,10 +1,10 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "simplenet_ui.h"
+#include "ui_simplenet_ui.h"
 
-MainWindow::MainWindow(QWidget *parent) :
+SimpleNetUI::SimpleNetUI(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow),
-    classifier(new LinearSVM(10, 3073))
+    ui(new Ui::SimpleNetUI),
+    classifier(new SimpleNeuralNet(3072, 50, 10, 0.0000001))
 {
     ui->setupUi(this);
 
@@ -39,14 +39,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
 
-        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
+        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
     }
 
     filters.clear();
     filters << "test_batch.bin";
     dir.setNameFilters(filters);
     foreach(QFileInfo mitm, dir.entryInfoList()){
-        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
+        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
     }
 
     // Ui init
@@ -68,18 +68,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->regBox->setSingleStep(0.00001);
     ui->regBox->setValue(classifier->lambda);
 
-    updateImage();
+    //updateImage();
 
-    visualizeWeights();
+    //visualizeWeights();
 }
 
-MainWindow::~MainWindow()
+SimpleNetUI::~SimpleNetUI()
 {
     delete ui;
     delete classifier;
 }
 
-void MainWindow::updateImage(){
+void SimpleNetUI::updateImage(){
   int index = ui->labelSpinBox->value();
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
@@ -94,37 +94,37 @@ void MainWindow::updateImage(){
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
   ui->labelLineEdit->setText(QString::fromStdString(label_names[trainset.labels_[index]]));
 
-  std::vector<float> scores = classifier->scores(trainset.images_[index]);
+//  std::vector<float> scores = classifier->scores(trainset.images_[index]);
   int predicted_label = classifier->inference(trainset.images_[index]);
   ui->predictionLineEdit->setText(QString::fromStdString( label_names[predicted_label] ));
 
-  ui->labelPlaneScore->setText(QString::number( scores[0], 10, 5));
-  ui->labelCarScore->setText(QString::number(   scores[1], 10, 5));
-  ui->labelBirdScore->setText(QString::number(  scores[2], 10, 5));
-  ui->labelCatScore->setText(QString::number(   scores[3], 10, 5));
-  ui->labelDeerScore->setText(QString::number(  scores[4], 10, 5));
-  ui->labelDogScore->setText(QString::number(   scores[5], 10, 5));
-  ui->labelFrogScore->setText(QString::number(  scores[6], 10, 5));
-  ui->labelHorseScore->setText(QString::number( scores[7], 10, 5));
-  ui->labelShipScore->setText(QString::number(  scores[8], 10, 5));
-  ui->labelTruckScore->setText(QString::number( scores[9], 10, 5));
+//  ui->labelPlaneScore->setText(QString::number( scores[0], 10, 5));
+//  ui->labelCarScore->setText(QString::number(   scores[1], 10, 5));
+//  ui->labelBirdScore->setText(QString::number(  scores[2], 10, 5));
+//  ui->labelCatScore->setText(QString::number(   scores[3], 10, 5));
+//  ui->labelDeerScore->setText(QString::number(  scores[4], 10, 5));
+//  ui->labelDogScore->setText(QString::number(   scores[5], 10, 5));
+//  ui->labelFrogScore->setText(QString::number(  scores[6], 10, 5));
+//  ui->labelHorseScore->setText(QString::number( scores[7], 10, 5));
+//  ui->labelShipScore->setText(QString::number(  scores[8], 10, 5));
+//  ui->labelTruckScore->setText(QString::number( scores[9], 10, 5));
 
-  // Evaluate loss vector
-  std::vector<float> loss_vec = classifier->inference_loss(trainset.images_[index], trainset.labels_[index]);
-  ui->labelPlaneLoss->setText(QString::number( loss_vec[0], 10, 5));
-  ui->labelCarLoss->setText(QString::number(   loss_vec[1], 10, 5));
-  ui->labelBirdLoss->setText(QString::number(  loss_vec[2], 10, 5));
-  ui->labelCatLoss->setText(QString::number(   loss_vec[3], 10, 5));
-  ui->labelDeerLoss->setText(QString::number(  loss_vec[4], 10, 5));
-  ui->labelDogLoss->setText(QString::number(   loss_vec[5], 10, 5));
-  ui->labelFrogLoss->setText(QString::number(  loss_vec[6], 10, 5));
-  ui->labelHorseLoss->setText(QString::number( loss_vec[7], 10, 5));
-  ui->labelShipLoss->setText(QString::number(  loss_vec[8], 10, 5));
-  ui->labelTruckLoss->setText(QString::number( loss_vec[9], 10, 5));
+//  // Evaluate loss vector
+//  std::vector<float> loss_vec = classifier->inference_loss(trainset.images_[index], trainset.labels_[index]);
+//  ui->labelPlaneLoss->setText(QString::number( loss_vec[0], 10, 5));
+//  ui->labelCarLoss->setText(QString::number(   loss_vec[1], 10, 5));
+//  ui->labelBirdLoss->setText(QString::number(  loss_vec[2], 10, 5));
+//  ui->labelCatLoss->setText(QString::number(   loss_vec[3], 10, 5));
+//  ui->labelDeerLoss->setText(QString::number(  loss_vec[4], 10, 5));
+//  ui->labelDogLoss->setText(QString::number(   loss_vec[5], 10, 5));
+//  ui->labelFrogLoss->setText(QString::number(  loss_vec[6], 10, 5));
+//  ui->labelHorseLoss->setText(QString::number( loss_vec[7], 10, 5));
+//  ui->labelShipLoss->setText(QString::number(  loss_vec[8], 10, 5));
+//  ui->labelTruckLoss->setText(QString::number( loss_vec[9], 10, 5));
 
 }
 
-void MainWindow::on_actionOpen_dataset_triggered()
+void SimpleNetUI::on_actionOpen_dataset_triggered()
 {
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
     if(folder_path.isEmpty()) return;
@@ -146,17 +146,17 @@ void MainWindow::on_actionOpen_dataset_triggered()
 
     foreach(QFileInfo mitm, dir.entryInfoList()){
 
-        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
+        trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
     }
 
     filters.clear();
     filters << "test_batch.bin";
     dir.setNameFilters(filters);
     foreach(QFileInfo mitm, dir.entryInfoList()){
-        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
+        testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
     }
 
-    updateImage();
+    //updateImage();
 }
 
 void weight2image(CMatrix<float> w, int label, QImage &img){
@@ -173,7 +173,7 @@ void weight2image(CMatrix<float> w, int label, QImage &img){
 
    }
 
-void MainWindow::visualizeWeights(){
+void SimpleNetUI::visualizeWeights(){
     QImage img0(32, 32, QImage::Format_RGB888);
     QImage img1(32, 32, QImage::Format_RGB888);
     QImage img2(32, 32, QImage::Format_RGB888);
@@ -185,7 +185,7 @@ void MainWindow::visualizeWeights(){
     QImage img8(32, 32, QImage::Format_RGB888);
     QImage img9(32, 32, QImage::Format_RGB888);
 
-    CMatrix<float> normW = classifier->W;
+    CMatrix<float> normW = classifier->W1;
     normW.normalize(0,255);
 
     weight2image(normW, 0, img0);
@@ -234,7 +234,7 @@ void MainWindow::visualizeWeights(){
 
 }
 
-float MainWindow::evaluateAcc(){
+float SimpleNetUI::evaluateAcc(){
     int correct = 0;
     int total = 0;
     for(int i=0; i<testset.images_.size(); ++i){
@@ -246,8 +246,9 @@ float MainWindow::evaluateAcc(){
     return correct/static_cast<float>(total);
 }
 
-void MainWindow::on_pushButton_clicked()
+void SimpleNetUI::on_pushButton_clicked()
 {
+    //classifier->initializeW();
     stopped_ = false;
     int bs = ui->bsBox->value();
     int iters = trainset.images_.size()/bs;
@@ -255,26 +256,27 @@ void MainWindow::on_pushButton_clicked()
 
         for(int i=0; i<iters; ++i){
             float loss = classifier->loss(trainset.images_, trainset.labels_, trainset.get_batch_idxs(bs));
+            std::cout << " Loss " << loss << std::endl;
 
             ui->lossLabel->setText("Loss: " + QString::number(loss));
-            visualizeWeights();
-            updateImage();
+            //visualizeWeights();
+            //updateImage();
             qApp->processEvents();
             if(stopped_) return;
-            float Wmax = classifier->W.max();
-            float Wmin = classifier->W.min();
-            ui->labelWMax->setText("WMax: " + QString::number(Wmax));
-            ui->labelWMin->setText("WMin: " + QString::number(Wmin));
+//            float Wmax = classifier->W1.max();
+//            float Wmin = classifier->W1.min();
+//            ui->labelWMax->setText("WMax: " + QString::number(Wmax));
+//            ui->labelWMin->setText("WMin: " + QString::number(Wmin));
 
-            float dWmax = classifier->dW.max();
-            float dWmin = classifier->dW.min();
-            ui->labeldWMax->setText("dWMax: " + QString::number(dWmax));
-            ui->labeldWMin->setText("dWMin: " + QString::number(dWmin));
+//            float dWmax = classifier->dW1.max();
+//            float dWmin = classifier->dW1.min();
+//            ui->labeldWMax->setText("dWMax: " + QString::number(dWmax));
+//            ui->labeldWMin->setText("dWMin: " + QString::number(dWmin));
 
-            ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax*classifier->learning_rate));
-            ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin*classifier->learning_rate));
+//            ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax*classifier->learning_rate));
+//            ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin*classifier->learning_rate));
 
-            ui->labelRatio->setText("Ratio: " + QString::number(classifier->weight_ratio()));
+            //ui->labelRatio->setText("Ratio: " + QString::number(classifier->weight_ratio()));
 
         }
 
@@ -285,53 +287,53 @@ void MainWindow::on_pushButton_clicked()
     }
 }
 
-void MainWindow::on_labelSpinBox_valueChanged(int arg1)
+void SimpleNetUI::on_labelSpinBox_valueChanged(int arg1)
 {
     updateImage();
 }
 
-void MainWindow::on_stopButton_clicked()
+void SimpleNetUI::on_stopButton_clicked()
 {
     stopped_ = true;
 }
 
-void MainWindow::on_resetButton_clicked()
+void SimpleNetUI::on_resetButton_clicked()
 {
     classifier->initializeW();
-    visualizeWeights();
+    //visualizeWeights();
 }
 
-void MainWindow::on_learningRateBox_valueChanged(int lr_exp)
+void SimpleNetUI::on_learningRateBox_valueChanged(int lr_exp)
 {
     classifier->learning_rate = std::pow(10.f,-ui->learningRateBox->value());
     std::cout << "New learning rate value " << std::pow(10.f,-ui->learningRateBox->value()) << std::endl;
 }
 
-void MainWindow::on_SVMRadioButton_clicked()
+void SimpleNetUI::on_SVMRadioButton_clicked()
 {
-    gW = classifier->W;
-    delete classifier;
-    classifier = new LinearSVM(10, 3073);
-    classifier->copyW(gW);
-    visualizeWeights();
+//    gW = classifier->W;
+//    delete classifier;
+//    classifier = new LinearSVM(10, 3073);
+//    classifier->copyW(gW);
+//    visualizeWeights();
 }
 
-void MainWindow::on_SoftmaxRadioButton_clicked()
+void SimpleNetUI::on_SoftmaxRadioButton_clicked()
 {
-    gW = classifier->W;
-    delete classifier;
-    classifier = new LinearSoftmax(10, 3073);
-    classifier->copyW(gW);
-    visualizeWeights();
+//    gW = classifier->W;
+//    delete classifier;
+//    classifier = new LinearSoftmax(10, 3073);
+//    classifier->copyW(gW);
+//    visualizeWeights();
 }
 
-void MainWindow::on_regBox_valueChanged(double regularizer)
+void SimpleNetUI::on_regBox_valueChanged(double regularizer)
 {
     classifier->lambda = regularizer;
     std::cout << "New regularization value " << regularizer << std::endl;
 }
 
-void MainWindow::on_buttonMeanImage_clicked()
+void SimpleNetUI::on_buttonMeanImage_clicked()
 {
     // Demean test set
     trainset.compute_mean();
@@ -360,7 +362,7 @@ void MainWindow::on_buttonMeanImage_clicked()
 
 }
 
-void MainWindow::on_buttonNormalizationReset_clicked()
+void SimpleNetUI::on_buttonNormalizationReset_clicked()
 {
     trainset.reset();
     testset.reset();
@@ -369,7 +371,7 @@ void MainWindow::on_buttonNormalizationReset_clicked()
     ui->dataMax->setText("Max: " + QString::number( minmax.second ));
 }
 
-void MainWindow::on_buttonStandardize_clicked()
+void SimpleNetUI::on_buttonStandardize_clicked()
 {
     // Standardize trainset
     trainset.compute_mean();
@@ -415,7 +417,7 @@ void MainWindow::on_buttonStandardize_clicked()
 
 }
 
-void MainWindow::on_buttonNormalize_clicked()
+void SimpleNetUI::on_buttonNormalize_clicked()
 {
     trainset.normalize();
     testset.normalize();
