@@ -18,6 +18,7 @@ public:
     //
     float learning_rate;
     float lambda;
+    float mu; // momentum
 
     // Variables for clarity
     int input_size_;
@@ -45,6 +46,11 @@ public:
     CMatrix<float> dW2;
 
     std::vector<float> db1, db2;
+
+    // Velocities for momentum
+    CMatrix<float> vW1;
+    CMatrix<float> vW2;
+    std::vector<float> vb1, vb2;
 
     // Scores
     std::vector<float> S;

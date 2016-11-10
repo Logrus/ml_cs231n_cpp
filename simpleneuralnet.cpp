@@ -6,6 +6,7 @@ SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size, int output_siz
     // Initialize hyperparameters
     learning_rate = 1e-4;
     lambda = 0.5;
+    mu = 0.99;
     initializeW();
 }
 
@@ -67,19 +68,23 @@ float SimpleNeuralNet::loss(const vvfloat &images, const vint &labels, const vin
     // **********************
     for(int s=0; s<output_size_; ++s){
         for(int h=0; h<hidden_size_; ++h){
-            W2(s,h) -= learning_rate*dW2(s, h);
+            vW2(s, h) = mu*vW2(s, h) - learning_rate*dW2(s, h);
+            W2(s,h) += vW2(s, h);
         }
     }
     for(int i=0; i<b2.size(); ++i){
-        b2[i] -= learning_rate*db2[i];
+        vb2[i] = mu*vb2[i] - learning_rate*db2[i];
+        b2[i] += vb2[i];
     }
     for(int i=0; i<input_size_; ++i){
         for(int h=0; h<hidden_size_; ++h){
-            W1(h,i) -= learning_rate*dW1(h, i);
+            vW1(h,i) = mu*vW1(h,i) - learning_rate*dW1(h,i);
+            W1(h,i) += vW1(h,i);
         }
     }
     for(int i=0; i<b1.size(); ++i){
-        b1[i] -= learning_rate*db1[i];
+        vb1[i] = mu*vb1[i] - learning_rate*db1[i];
+        b1[i] += vb1[i];
     }
 
     return L;
@@ -270,4 +275,14 @@ void SimpleNeuralNet::initializeW()
 
     // Initialize score
     S.resize(output_size_);
+
+    // Initialize momentum
+    vW1.setSize(hidden_size_, input_size_);
+    vW2.setSize(output_size_, hidden_size_);
+    vW1.fill(0.f);
+    vW2.fill(0.f);
+    vb1.resize(hidden_size_);
+    vb2.resize(output_size_);
+    std::fill(vb1.begin(), vb1.end(), 0.f);
+    std::fill(vb2.begin(), vb2.end(), 0.f);
 }
