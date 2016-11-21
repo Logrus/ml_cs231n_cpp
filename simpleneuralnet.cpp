@@ -68,29 +68,66 @@ float SimpleNeuralNet::loss(const vvfloat &images, const vint &labels, const vin
     // **********************
     //  Update weights
     // **********************
+    t++;
     for(int s=0; s<output_size_; ++s){
         for(int h=0; h<hidden_size_; ++h){
+            // Adam
+            mW2(s, h) = beta1*mW2(s, h) + (1-beta1)*dW2(s, h);
+            vW2(s, h) = beta2*vW2(s, h) + (1-beta2)*(dW2(s, h)*dW2(s,h));
+            // Bias correction
+            float mb = mW2(s,h) / (1 - std::pow(beta1,t));
+            float vb = vW2(s,h) / (1 - std::pow(beta2,t));
+            W2(s,h) += -learning_rate * mb / (std::sqrt(vb)+1.0e-8);
+            // Momentum
             //vW2(s, h) = mu*vW2(s, h) - learning_rate*dW2(s, h);
             //W2(s,h) += vW2(s, h);
-            W2(s,h) += -learning_rate*dW2(s, h);
+            // SGD
+            //W2(s,h) += -learning_rate*dW2(s, h);
         }
     }
     for(int i=0; i<b2.size(); ++i){
+        // Adam
+        mb2[i] = beta1*mb2[i] + (1-beta1)*db2[i];
+        vb2[i] = beta2*vb2[i] + (1-beta2)*(db2[i]*db2[i]);
+        // Bias correction
+        float mb = mb2[i] / (1 - std::pow(beta1,t));
+        float vb = vb2[i] / (1 - std::pow(beta2,t));
+        b2[i] += -learning_rate * mb / (std::sqrt(vb)+1.0e-8);
+        // Momentum
         //vb2[i] = mu*vb2[i] - learning_rate*db2[i];
         //b2[i] += vb2[i];
-        b2[i] += - learning_rate*db2[i];
+        // SGD
+        //b2[i] += - learning_rate*db2[i];
     }
     for(int i=0; i<input_size_; ++i){
         for(int h=0; h<hidden_size_; ++h){
+            // Adam
+            mW1(h, i) = beta1*mW1(h, i) + (1-beta1)*dW1(h, i);
+            vW1(h, i) = beta2*vW1(h, i) + (1-beta2)*(dW1(h, i)*dW1(h,i));
+            // Bias correction
+            float mb = mW1(h,i) / (1 - std::pow(beta1,t));
+            float vb = vW1(h,i) / (1 - std::pow(beta2,t));
+            W1(h,i) += -learning_rate * mb / (std::sqrt(vb)+1.0e-8);
+            // Momentum
             //vW1(h,i) = mu*vW1(h,i) - learning_rate*dW1(h,i);
             //W1(h,i) += vW1(h,i);
-            W1(h,i) += - learning_rate*dW1(h,i);
+            // SGD
+            //W1(h,i) += - learning_rate*dW1(h,i);
         }
     }
     for(int i=0; i<b1.size(); ++i){
+        // Adam
+        mb1[i] = beta1*mb1[i] + (1-beta1)*db1[i];
+        vb1[i] = beta2*vb1[i] + (1-beta2)*(db1[i]*db1[i]);
+        // Bias correction
+        float mb = mb1[i] / (1 - std::pow(beta1,t));
+        float vb = vb1[i] / (1 - std::pow(beta2,t));
+        b1[i] += -learning_rate * mb / (std::sqrt(vb)+1.0e-8);
+        // Momentum
         //vb1[i] = mu*vb1[i] - learning_rate*db1[i];
         //b1[i] += vb1[i];
-        b1[i] += - learning_rate*db1[i];
+        // SGD
+        //b1[i] += - learning_rate*db1[i];
     }
 
     return L;
@@ -302,6 +339,19 @@ void SimpleNeuralNet::initializeW()
     vb2.resize(output_size_);
     std::fill(vb1.begin(), vb1.end(), 0.f);
     std::fill(vb2.begin(), vb2.end(), 0.f);
+
+    // Initialize parameters for Adam
+    mW1.setSize(hidden_size_, input_size_);
+    mW2.setSize(output_size_, hidden_size_);
+    mW1.fill(0.f);
+    mW2.fill(0.f);
+    mb1.resize(hidden_size_);
+    mb2.resize(output_size_);
+    std::fill(mb1.begin(), mb1.end(), 0.f);
+    std::fill(mb2.begin(), mb2.end(), 0.f);
+    t = 0;
+    beta1 = 0.9;
+    beta2 = 0.999;
 }
 
 bool SimpleNeuralNet::saveWeights(std::__cxx11::string filename)
@@ -337,9 +387,9 @@ bool SimpleNeuralNet::saveWeights(std::__cxx11::string filename)
     file.write(reinterpret_cast<char*>(b1.data()), size*sizeof(float));
 
     // Save b2
-    size = b1.size();
+    size = b2.size();
     file.write(reinterpret_cast<char*>(&size), sizeof(size));
-    file.write(reinterpret_cast<char*>(b1.data()), size*sizeof(float));
+    file.write(reinterpret_cast<char*>(b2.data()), size*sizeof(float));
 
     file.close();
     return true;

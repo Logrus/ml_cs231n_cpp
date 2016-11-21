@@ -54,6 +54,13 @@ public:
     CMatrix<float> vW2;
     std::vector<float> vb1, vb2;
 
+    // For Adam
+    CMatrix<float> mW1;
+    CMatrix<float> mW2;
+    std::vector<float> mb1, mb2;
+    int t;
+    float beta1, beta2;
+
     // Scores
     std::vector<float> S;
 
