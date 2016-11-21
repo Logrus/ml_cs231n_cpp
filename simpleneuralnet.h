@@ -54,6 +54,10 @@ public:
 
     // Scores
     std::vector<float> S;
+
+    // Statistics
+    std::vector<float> H_;
+    std::vector<float> neural_statistics;
 };
 
 #endif // SIMPLENEURALNET_H

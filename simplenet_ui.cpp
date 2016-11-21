@@ -68,9 +68,24 @@ SimpleNetUI::SimpleNetUI(QWidget *parent) :
     ui->regBox->setSingleStep(0.00001);
     ui->regBox->setValue(classifier->lambda);
 
-    //updateImage();
+    updateImage();
 
-    //visualizeWeights();
+    TableWidget = new QTableWidget(this);
+    TableWidget->setRowCount(10);
+    TableWidget->setColumnCount(7);
+    TableWidget->horizontalHeader()->setDefaultSectionSize(100);
+    TableWidget->verticalHeader()->setDefaultSectionSize(100);
+    TableWidget->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+    TableWidget->verticalHeader()->setResizeMode(QHeaderView::Fixed);
+    TableWidget->resize(801, 321);
+    TableWidget->move(10, 400);
+
+    visualizeWeights();
+    QPalette pal;
+    pal.setColor(QPalette::Background, Qt::red);
+
+    ui->groupBox_2->setPalette(pal);
+
 }
 
 SimpleNetUI::~SimpleNetUI()
@@ -94,34 +109,36 @@ void SimpleNetUI::updateImage(){
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
   ui->labelLineEdit->setText(QString::fromStdString(label_names[trainset.labels_[index]]));
 
-//  std::vector<float> scores = classifier->scores(trainset.images_[index]);
   int predicted_label = classifier->inference(trainset.images_[index]);
   ui->predictionLineEdit->setText(QString::fromStdString( label_names[predicted_label] ));
 
-//  ui->labelPlaneScore->setText(QString::number( scores[0], 10, 5));
-//  ui->labelCarScore->setText(QString::number(   scores[1], 10, 5));
-//  ui->labelBirdScore->setText(QString::number(  scores[2], 10, 5));
-//  ui->labelCatScore->setText(QString::number(   scores[3], 10, 5));
-//  ui->labelDeerScore->setText(QString::number(  scores[4], 10, 5));
-//  ui->labelDogScore->setText(QString::number(   scores[5], 10, 5));
-//  ui->labelFrogScore->setText(QString::number(  scores[6], 10, 5));
-//  ui->labelHorseScore->setText(QString::number( scores[7], 10, 5));
-//  ui->labelShipScore->setText(QString::number(  scores[8], 10, 5));
-//  ui->labelTruckScore->setText(QString::number( scores[9], 10, 5));
+  auto hid = classifier->H_;
+  auto minmax = std::minmax_element(hid.begin(), hid.end());
+  float range = *minmax.second - *minmax.first;
+  QImage hidden(70, 1,  QImage::Format_RGB888);
+  for (int x = 0; x < 70; ++x) {
+      int val = (hid[x]-*minmax.first)/range * 255.0;
+      int red  =val;
+      int green=val;
+      int blue =val;
+      hidden.setPixel(x, 0, qRgb(red, green, blue));
+  }
+  hidden = hidden.scaledToWidth(ui->pic_hidden->width(), Qt::FastTransformation);
+  ui->pic_hidden->setPixmap(QPixmap::fromImage(hidden));
 
-//  // Evaluate loss vector
-//  std::vector<float> loss_vec = classifier->inference_loss(trainset.images_[index], trainset.labels_[index]);
-//  ui->labelPlaneLoss->setText(QString::number( loss_vec[0], 10, 5));
-//  ui->labelCarLoss->setText(QString::number(   loss_vec[1], 10, 5));
-//  ui->labelBirdLoss->setText(QString::number(  loss_vec[2], 10, 5));
-//  ui->labelCatLoss->setText(QString::number(   loss_vec[3], 10, 5));
-//  ui->labelDeerLoss->setText(QString::number(  loss_vec[4], 10, 5));
-//  ui->labelDogLoss->setText(QString::number(   loss_vec[5], 10, 5));
-//  ui->labelFrogLoss->setText(QString::number(  loss_vec[6], 10, 5));
-//  ui->labelHorseLoss->setText(QString::number( loss_vec[7], 10, 5));
-//  ui->labelShipLoss->setText(QString::number(  loss_vec[8], 10, 5));
-//  ui->labelTruckLoss->setText(QString::number( loss_vec[9], 10, 5));
-
+  auto scores = classifier->inference_scores(trainset.images_[index]);
+  minmax = std::minmax_element(scores.begin(), scores.end());
+  range = *minmax.second - *minmax.first;
+  QImage sores_pic(10, 1,  QImage::Format_RGB888);
+  for (int x = 0; x < 10; ++x) {
+      int val = (scores[x]-*minmax.first)/range * 255.0;
+      int red  =val;
+      int green=val;
+      int blue =val;
+      sores_pic.setPixel(x, 0, qRgb(red, green, blue));
+  }
+  sores_pic = sores_pic.scaledToWidth(ui->pic_softmax->width(), Qt::FastTransformation);
+  ui->pic_softmax->setPixmap(QPixmap::fromImage(sores_pic));
 }
 
 void SimpleNetUI::on_actionOpen_dataset_triggered()
@@ -174,67 +191,30 @@ void weight2image(CMatrix<float> w, int label, QImage &img){
    }
 
 void SimpleNetUI::visualizeWeights(){
-    QImage img0(32, 32, QImage::Format_RGB888);
-    QImage img1(32, 32, QImage::Format_RGB888);
-    QImage img2(32, 32, QImage::Format_RGB888);
-    QImage img3(32, 32, QImage::Format_RGB888);
-    QImage img4(32, 32, QImage::Format_RGB888);
-    QImage img5(32, 32, QImage::Format_RGB888);
-    QImage img6(32, 32, QImage::Format_RGB888);
-    QImage img7(32, 32, QImage::Format_RGB888);
-    QImage img8(32, 32, QImage::Format_RGB888);
-    QImage img9(32, 32, QImage::Format_RGB888);
 
     CMatrix<float> normW = classifier->W1;
     normW.normalize(0,255);
 
-    weight2image(normW, 0, img0);
-    weight2image(normW, 1, img1);
-    weight2image(normW, 2, img2);
-    weight2image(normW, 3, img3);
-    weight2image(normW, 4, img4);
-    weight2image(normW, 5, img5);
-    weight2image(normW, 6, img6);
-    weight2image(normW, 7, img7);
-    weight2image(normW, 8, img8);
-    weight2image(normW, 9, img9);
+    for (int i=0; i<70; i++){
+       int ix = i/7;
+       int iy = i%7;
+       //delete TableWidget->item(ix, iy);
+       QImage * img = new QImage(32, 32, QImage::Format_RGB888);
+       weight2image(normW, i, *img);
+       *img = img->scaled(100, 100);
 
-    img0=img0.scaledToWidth(ui->w1label->width(), Qt::SmoothTransformation);
-    img1=img1.scaledToWidth(ui->w2label->width(), Qt::SmoothTransformation);
-    img2=img2.scaledToWidth(ui->w3label->width(), Qt::SmoothTransformation);
-    img3=img3.scaledToWidth(ui->w4label->width(), Qt::SmoothTransformation);
-    img4=img4.scaledToWidth(ui->w5label->width(), Qt::SmoothTransformation);
-    img5=img5.scaledToWidth(ui->w6label->width(), Qt::SmoothTransformation);
-    img6=img6.scaledToWidth(ui->w7label->width(), Qt::SmoothTransformation);
-    img7=img7.scaledToWidth(ui->w8label->width(), Qt::SmoothTransformation);
-    img8=img8.scaledToWidth(ui->w9label->width(), Qt::SmoothTransformation);
-    img9=img9.scaledToWidth(ui->w10label->width(), Qt::SmoothTransformation);
-
-    ui->w1label->setPixmap(QPixmap::fromImage(img0));
-    ui->w2label->setPixmap(QPixmap::fromImage(img1));
-    ui->w3label->setPixmap(QPixmap::fromImage(img2));
-    ui->w4label->setPixmap(QPixmap::fromImage(img3));
-    ui->w5label->setPixmap(QPixmap::fromImage(img4));
-    ui->w6label->setPixmap(QPixmap::fromImage(img5));
-    ui->w7label->setPixmap(QPixmap::fromImage(img6));
-    ui->w8label->setPixmap(QPixmap::fromImage(img7));
-    ui->w9label->setPixmap(QPixmap::fromImage(img8));
-    ui->w10label->setPixmap(QPixmap::fromImage(img9));
-
-    ui->w1label->show();
-    ui->w2label->show();
-    ui->w3label->show();
-    ui->w4label->show();
-    ui->w5label->show();
-    ui->w6label->show();
-    ui->w7label->show();
-    ui->w8label->show();
-    ui->w9label->show();
-    ui->w10label->show();
+       QTableWidgetItem * item = new QTableWidgetItem;
+       item->setData(Qt::DecorationRole, QPixmap::fromImage(*img));
+       TableWidget->setItem(ix, iy, item);
+       delete img;
+    }
+    //TableWidget->repaint();
+    TableWidget->viewport()->update();
 
 }
 
 float SimpleNetUI::evaluateAcc(){
+    std::fill(classifier->neural_statistics.begin(), classifier->neural_statistics.end(), 0);
     int correct = 0;
     int total = 0;
     for(int i=0; i<testset.images_.size(); ++i){
@@ -242,6 +222,17 @@ float SimpleNetUI::evaluateAcc(){
        if(label == testset.labels_[i]) correct++;
        total++;
     }
+    
+    int counter=0;
+
+    for (auto a: classifier->neural_statistics){
+        if(a == 0) counter++;
+    }
+    std::cout << std::endl;
+    
+
+    std::cout << "Dead neurons " << counter << std::endl;
+
 
     return correct/static_cast<float>(total);
 }
@@ -254,12 +245,20 @@ void SimpleNetUI::on_pushButton_clicked()
     for(int epoch = 0; epoch < ui->iterBox->value(); epoch++){
 
         for(int i=0; i<iters; ++i){
+
+            // Experiment with Leaky ReLU
+            // if (i >=5 && i<=50){
+            //     classifier->learning_rate = 0.01;
+            // } else {
+            //     classifier->learning_rate = std::pow(10.f,-ui->learningRateBox->value());
+            // }
+
             float loss = classifier->loss(trainset.images_, trainset.labels_, trainset.get_batch_idxs(bs));
             std::cout << " Loss " << loss << std::endl;
 
             ui->lossLabel->setText("Loss: " + QString::number(loss));
-            //visualizeWeights();
-            //updateImage();
+            visualizeWeights();
+            updateImage();
             qApp->processEvents();
             if(stopped_) return;
             float Wmax = classifier->W1.max();
@@ -299,31 +298,13 @@ void SimpleNetUI::on_stopButton_clicked()
 void SimpleNetUI::on_resetButton_clicked()
 {
     classifier->initializeW();
-    //visualizeWeights();
+    visualizeWeights();
 }
 
 void SimpleNetUI::on_learningRateBox_valueChanged(int lr_exp)
 {
     classifier->learning_rate = std::pow(10.f,-ui->learningRateBox->value());
     std::cout << "New learning rate value " << std::pow(10.f,-ui->learningRateBox->value()) << std::endl;
-}
-
-void SimpleNetUI::on_SVMRadioButton_clicked()
-{
-//    gW = classifier->W;
-//    delete classifier;
-//    classifier = new LinearSVM(10, 3073);
-//    classifier->copyW(gW);
-//    visualizeWeights();
-}
-
-void SimpleNetUI::on_SoftmaxRadioButton_clicked()
-{
-//    gW = classifier->W;
-//    delete classifier;
-//    classifier = new LinearSoftmax(10, 3073);
-//    classifier->copyW(gW);
-//    visualizeWeights();
 }
 
 void SimpleNetUI::on_regBox_valueChanged(double regularizer)

@@ -5,6 +5,8 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QDir>
+#include <QTableWidget>
+#include <QTableWidgetItem>
 #include <iostream>
 #include "cifar_reader.h"
 #include "simpleneuralnet.h"
@@ -37,10 +39,6 @@ private slots:
 
     void on_learningRateBox_valueChanged(int arg1);
 
-    void on_SVMRadioButton_clicked();
-
-    void on_SoftmaxRadioButton_clicked();
-
     void on_regBox_valueChanged(double arg1);
 
     void on_buttonMeanImage_clicked();
@@ -61,6 +59,7 @@ private:
     CIFAR10Reader trainset;
     CIFAR10Reader testset;
     SimpleNeuralNet * classifier;
+    QTableWidget* TableWidget;
 
     bool stopped_ = false;
 };

@@ -7,6 +7,8 @@ SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size, int output_siz
     learning_rate = 1e-4;
     lambda = 0.5;
     mu = 0.99;
+    neural_statistics.resize(hidden_size_);
+    H_.resize(hidden_size_);
     initializeW();
 }
 
@@ -68,23 +70,27 @@ float SimpleNeuralNet::loss(const vvfloat &images, const vint &labels, const vin
     // **********************
     for(int s=0; s<output_size_; ++s){
         for(int h=0; h<hidden_size_; ++h){
-            vW2(s, h) = mu*vW2(s, h) - learning_rate*dW2(s, h);
-            W2(s,h) += vW2(s, h);
+            //vW2(s, h) = mu*vW2(s, h) - learning_rate*dW2(s, h);
+            //W2(s,h) += vW2(s, h);
+            W2(s,h) += -learning_rate*dW2(s, h);
         }
     }
     for(int i=0; i<b2.size(); ++i){
-        vb2[i] = mu*vb2[i] - learning_rate*db2[i];
-        b2[i] += vb2[i];
+        //vb2[i] = mu*vb2[i] - learning_rate*db2[i];
+        //b2[i] += vb2[i];
+        b2[i] += - learning_rate*db2[i];
     }
     for(int i=0; i<input_size_; ++i){
         for(int h=0; h<hidden_size_; ++h){
-            vW1(h,i) = mu*vW1(h,i) - learning_rate*dW1(h,i);
-            W1(h,i) += vW1(h,i);
+            //vW1(h,i) = mu*vW1(h,i) - learning_rate*dW1(h,i);
+            //W1(h,i) += vW1(h,i);
+            W1(h,i) += - learning_rate*dW1(h,i);
         }
     }
     for(int i=0; i<b1.size(); ++i){
-        vb1[i] = mu*vb1[i] - learning_rate*db1[i];
-        b1[i] += vb1[i];
+        //vb1[i] = mu*vb1[i] - learning_rate*db1[i];
+        //b1[i] += vb1[i];
+        b1[i] += - learning_rate*db1[i];
     }
 
     return L;
@@ -107,10 +113,16 @@ float SimpleNeuralNet::loss_one_image(const std::vector<float> &image, const int
     // ReLu and it's derivative
     std::vector<float> dmax (hidden_size_, 1.f);
     for(int h=0; h<hidden_size_; ++h){
-        if(H[h] <= 0.f) {
-            H[h] = 0.f;
-            dmax[h] = 0.f;
+        // ReLU
+        if(H[h] < 0.0f) {
+            H[h] = 0.0f;
+            dmax[h] = 0.0f;
         }
+        // Uncomment for leaky  ReLU
+        // if(H[h] < 0.01f*H[h]) {
+        //     H[h] = 0.01f*H[h];
+        //     dmax[h] = 0.01f;
+        // }
     }
 
     // S = W2*H + b2
@@ -216,8 +228,13 @@ std::vector<float> SimpleNeuralNet::inference_scores(const std::vector<float> &i
 
     // ReLU
     for(int h=0; h < hidden_size_; ++h){
-        H[h] = std::max(0.f, H[h]);
+        // ReLU
+        H[h] = std::max(0.0f, H[h]);
+        // Leaky ReLU
+        //H[h] = std::max(0.01f*H[h], H[h]);
+        neural_statistics[h] += (H[h]>0);
     }
+    this->H_ = H;
 
     // S = W2*H + b2
     std::fill(S.begin(), S.end(), 0.f);
