@@ -110,6 +110,26 @@ int main(){
        if(label == testset.labels_[i]) correct++;
        total++;
     }
+    std::cout << "Weight ensamble acc: " << correct/static_cast<float>(total) << std::endl;
+
+
+    correct = 0;
+    total = 0;
+    for(int i=0; i<testset.images_.size(); ++i){
+       auto scores1 = net1.inference_scores(testset.images_[i]);
+       auto scores2 = net2.inference_scores(testset.images_[i]);
+       auto scores3 = net3.inference_scores(testset.images_[i]);
+       auto scores4 = net4.inference_scores(testset.images_[i]);
+
+       auto avg(scores1);
+       for(int j=0; j<avg.size();++j){
+           avg[j] = (scores1[j] + scores2[j] + scores3[j] + scores4[j])/4.0;
+       }
+       int label = std::max_element(avg.begin(), avg.end()) - avg.begin();
+
+       if(label == testset.labels_[i]) correct++;
+       total++;
+    }
     std::cout << "Ensamble acc: " << correct/static_cast<float>(total) << std::endl;
 
     return 0;
