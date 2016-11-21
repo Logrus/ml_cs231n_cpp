@@ -262,7 +262,9 @@ void SimpleNetUI::on_pushButton_clicked()
             std::cout << " Loss " << loss << std::endl;
 
             ui->lossLabel->setText("Loss: " + QString::number(loss));
-            //visualizeWeights();
+            if(ui->updWeightViz->isChecked()){
+                visualizeWeights();
+            }
             updateImage();
             qApp->processEvents();
             if(stopped_) return;
@@ -425,9 +427,4 @@ void SimpleNetUI::on_buttonNormalize_clicked()
     auto minmax = trainset.minmax();
     ui->dataMin->setText("Min: " + QString::number( minmax.first ));
     ui->dataMax->setText("Max: " + QString::number( minmax.second ));
-}
-
-void SimpleNetUI::on_refWeights_clicked()
-{
-    visualizeWeights();
 }

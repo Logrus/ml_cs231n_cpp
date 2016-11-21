@@ -364,17 +364,17 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="refWeights">
+   <widget class="QCheckBox" name="updWeightViz">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>200</y>
-      <width>151</width>
-      <height>21</height>
+      <x>410</x>
+      <y>180</y>
+      <width>161</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>Refresh weights viz</string>
+     <string>Update weight viz</string>
     </property>
    </widget>
    <zorder>layoutWidget</zorder>
@@ -388,7 +388,7 @@
    <zorder>resetButton</zorder>
    <zorder>groupBox</zorder>
    <zorder>groupBox_2</zorder>
-   <zorder>refWeights</zorder>
+   <zorder>updWeightViz</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
