@@ -96,12 +96,14 @@ SimpleNetUI::~SimpleNetUI()
 
 void SimpleNetUI::updateImage(){
   int index = ui->labelSpinBox->value();
+  auto mx = trainset.minmax();
+  float r = mx.second - mx.first;
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-        int red=trainset.images_[index][y*32+x];
-        int green=trainset.images_[index][1024+y*32+x];
-        int blue=trainset.images_[index][2048+y*32+x];
+        int red  =(trainset.images_[index][y*32+x]-mx.first)/r*255.0;
+        int green=(trainset.images_[index][1024+y*32+x]-mx.first)/r*255.0;
+        int blue =(trainset.images_[index][2048+y*32+x]-mx.first)/r*255.0;
         img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
