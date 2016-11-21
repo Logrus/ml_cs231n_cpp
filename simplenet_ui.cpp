@@ -291,6 +291,18 @@ void SimpleNetUI::on_pushButton_clicked()
             std::cout << "Weights has been saved." << std::endl;
         }
 
+        std::cout << "b1: ";
+        for (auto a: classifier->b1){
+            std::cout << a << " ";
+        }
+        std::cout << std::endl;
+
+        std::cout << "b2: ";
+        for (auto a: classifier->b2){
+            std::cout << a << " ";
+        }
+        std::cout << std::endl;
+
     }
 }
 
