@@ -49,6 +49,8 @@ private slots:
 
     void on_buttonNormalize_clicked();
 
+    void on_refWeights_clicked();
+
 private:
     void visualizeWeights();
     float evaluateAcc();
