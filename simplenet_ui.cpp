@@ -80,12 +80,15 @@ SimpleNetUI::SimpleNetUI(QWidget *parent) :
     TableWidget->resize(801, 321);
     TableWidget->move(10, 400);
 
-    visualizeWeights();
+
     QPalette pal;
     pal.setColor(QPalette::Background, Qt::red);
 
     ui->groupBox_2->setPalette(pal);
 
+    classifier->loadWeights("weights.dat");
+
+    visualizeWeights();
 }
 
 SimpleNetUI::~SimpleNetUI()
@@ -283,6 +286,10 @@ void SimpleNetUI::on_pushButton_clicked()
         float acc = evaluateAcc();
         std::cout << "Accuracy " << acc << std::endl;
         ui->accLabel->setText("Accuracy: " + QString::number(acc));
+
+        if(classifier->saveWeights("weights.dat")){
+            std::cout << "Weights has been saved." << std::endl;
+        }
 
     }
 }

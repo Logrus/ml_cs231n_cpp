@@ -303,3 +303,83 @@ void SimpleNeuralNet::initializeW()
     std::fill(vb1.begin(), vb1.end(), 0.f);
     std::fill(vb2.begin(), vb2.end(), 0.f);
 }
+
+bool SimpleNeuralNet::saveWeights(std::__cxx11::string filename)
+{
+    std::ofstream file;
+    file.open(filename, std::ofstream::binary);
+
+    if(!file.is_open()){
+        std::cout << "Couldn't open the file " << filename << std::endl;
+        return false;
+    }
+
+    size_t size;
+
+    // Save W1
+    size = W1.xSize();
+    file.write(reinterpret_cast<char*>(&size), sizeof(size));
+    size = W1.ySize();
+    file.write(reinterpret_cast<char*>(&size), sizeof(size));
+    file.write(reinterpret_cast<char*>(W1.data()), W1.size()*sizeof(float));
+
+    // Save W2
+    size = W2.xSize();
+    file.write(reinterpret_cast<char*>(&size), sizeof(size));
+    size = W2.ySize();
+    file.write(reinterpret_cast<char*>(&size), sizeof(size));
+    file.write(reinterpret_cast<char*>(W2.data()), W2.size()*sizeof(float));
+
+
+    // Save b1
+    size = b1.size();
+    file.write(reinterpret_cast<char*>(&size), sizeof(size));
+    file.write(reinterpret_cast<char*>(b1.data()), size*sizeof(float));
+
+    // Save b2
+    size = b1.size();
+    file.write(reinterpret_cast<char*>(&size), sizeof(size));
+    file.write(reinterpret_cast<char*>(b1.data()), size*sizeof(float));
+
+    file.close();
+    return true;
+}
+
+bool SimpleNeuralNet::loadWeights(std::__cxx11::string filename)
+{
+    std::ifstream file;
+    file.open(filename, std::ifstream::binary);
+
+    if(!file.is_open()){
+        std::cout << "Couldn't open the file " << filename << std::endl;
+        return false;
+    }
+
+    size_t xSize, ySize, size;
+
+    // read W1
+    file.read(reinterpret_cast<char*>(&xSize), sizeof(xSize));
+    file.read(reinterpret_cast<char*>(&ySize), sizeof(ySize));
+    W1.setSize(xSize, ySize);
+    file.read(reinterpret_cast<char*>(W1.data()), xSize*ySize*sizeof(float));
+
+    // read W2
+    file.read(reinterpret_cast<char*>(&xSize), sizeof(xSize));
+    file.read(reinterpret_cast<char*>(&ySize), sizeof(ySize));
+    W2.setSize(xSize, ySize);
+    file.read(reinterpret_cast<char*>(W2.data()), xSize*ySize*sizeof(float));
+
+    // read b1
+    file.read(reinterpret_cast<char*>(&size), sizeof(size));
+    b1.resize(size);
+    file.read(reinterpret_cast<char*>(b1.data()), size*sizeof(float));
+
+    // read b2
+    file.read(reinterpret_cast<char*>(&size), sizeof(size));
+    b2.resize(size);
+    file.read(reinterpret_cast<char*>(b2.data()), size*sizeof(float));
+
+    file.close();
+    return true;
+
+}

@@ -34,6 +34,8 @@ public:
     std::vector<float> inference_scores(const std::vector<float> &image);
 
     void initializeW();
+    bool saveWeights(std::string filename);
+    bool loadWeights(std::string filename);
 
     // Weights
     CMatrix<float> W1;
