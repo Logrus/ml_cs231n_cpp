@@ -69,3 +69,5 @@ target_link_libraries (simple_net ${QT_LIBRARIES})
 
 add_executable(test_fisheryatesshuffle test_fisheryatesshuffle.cpp fisheryatesshuffle.cpp)
 add_executable(test_simpleneuralnetwork test_simpleneuralnetwork.cpp simpleneuralnet.cpp)
+
+add_executable(ensambles ensambles.cpp simpleneuralnet.cpp cifar_reader.cpp fisheryatesshuffle.cpp)

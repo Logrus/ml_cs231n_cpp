@@ -86,8 +86,11 @@ SimpleNetUI::SimpleNetUI(QWidget *parent) :
 
     ui->groupBox_2->setPalette(pal);
 
-    classifier->loadWeights("weights.dat");
-
+    if(classifier->loadWeights("weights.dat")){
+        float acc = evaluateAcc();
+        std::cout << "Accuracy " << acc << std::endl;
+        ui->accLabel->setText("Accuracy: " + QString::number(acc));
+    }
     visualizeWeights();
 }
 
