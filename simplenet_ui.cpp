@@ -350,7 +350,7 @@ void SimpleNetUI::on_pushButton_clicked()
             true_iter++;
 
             ui->lossplot->graph(0)->setData(iterations, loss_stats);
-            ui->lossplot->xAxis->setRange(0, true_iter);
+            ui->lossplot->xAxis->setRange(0, *(iterations.end()-1));
             ui->lossplot->yAxis->setRange(minloss, maxloss);
             ui->lossplot->replot();
 
@@ -375,7 +375,7 @@ void SimpleNetUI::on_pushButton_clicked()
 
         ui->accplot->graph(0)->setData(epochs,val_acc_stats);
         ui->accplot->graph(1)->setData(epochs,train_acc_stats);
-        ui->accplot->xAxis->setRange(0, true_epochs);
+        ui->accplot->xAxis->setRange(0,  *(epochs.end()-1));
         ui->accplot->yAxis->setRange(minacc, maxacc);
         ui->accplot->replot();
 
