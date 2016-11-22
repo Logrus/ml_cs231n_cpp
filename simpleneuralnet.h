@@ -5,6 +5,7 @@
 #include <chrono>
 #include <algorithm>
 #include <assert.h>
+#include <numeric>
 #include "CMatrix.h"
 
 typedef std::vector< std::vector<float> > vvfloat;

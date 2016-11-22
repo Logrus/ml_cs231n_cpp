@@ -354,7 +354,7 @@ void SimpleNeuralNet::initializeW()
     beta2 = 0.999;
 }
 
-bool SimpleNeuralNet::saveWeights(std::__cxx11::string filename)
+bool SimpleNeuralNet::saveWeights(std::string filename)
 {
     std::ofstream file;
     file.open(filename, std::ofstream::binary);
@@ -395,7 +395,7 @@ bool SimpleNeuralNet::saveWeights(std::__cxx11::string filename)
     return true;
 }
 
-bool SimpleNeuralNet::loadWeights(std::__cxx11::string filename)
+bool SimpleNeuralNet::loadWeights(std::string filename)
 {
     std::ifstream file;
     file.open(filename, std::ifstream::binary);
