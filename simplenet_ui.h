@@ -12,6 +12,7 @@
 #include "simpleneuralnet.h"
 #include "CMatrix.h"
 #include <math.h>
+#include "qcustomplot.h"
 
 namespace Ui {
 class SimpleNetUI;
@@ -52,6 +53,7 @@ private slots:
 private:
     void visualizeWeights();
     float evaluateAcc();
+    float evaluateTrainAcc();
 
     std::vector<std::string> label_names;
 
@@ -62,6 +64,12 @@ private:
     QTableWidget* TableWidget;
 
     bool stopped_ = false;
+
+    QVector<double> loss_stats;
+    QVector<double> val_acc_stats;
+    QVector<double> train_acc_stats;
+    QVector<double> iterations;
+    QVector<double> epochs;
 };
 
 

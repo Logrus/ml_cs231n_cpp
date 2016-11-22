@@ -54,11 +54,13 @@ set(net_SOURCES simplenet_main.cpp
                 simplenet_ui.cpp
                 simpleneuralnet.cpp
                 cifar_reader.cpp
-                fisheryatesshuffle.cpp)
+                fisheryatesshuffle.cpp
+                qcustomplot.cpp)
 set(net_HEADERS simplenet_ui.h
                 simpleneuralnet.h
                 cifar_reader.h
-                fisheryatesshuffle.h)
+                fisheryatesshuffle.h
+                qcustomplot.h)
 set(net_FORMS   simplenet_ui.ui)
 
 QT4_WRAP_CPP (net_HEADERS_MOC   ${net_HEADERS})

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>832</width>
+    <width>1224</width>
     <height>751</height>
    </rect>
   </property>
@@ -14,19 +14,6 @@
    <string>SimpleNetUI</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
-    <property name="geometry">
-     <rect>
-      <x>140</x>
-      <y>10</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Train</string>
-    </property>
-   </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
@@ -54,32 +41,6 @@
       <widget class="QSpinBox" name="labelSpinBox"/>
      </item>
     </layout>
-   </widget>
-   <widget class="QPushButton" name="stopButton">
-    <property name="geometry">
-     <rect>
-      <x>230</x>
-      <y>10</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stop</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="resetButton">
-    <property name="geometry">
-     <rect>
-      <x>320</x>
-      <y>10</y>
-      <width>80</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Reset</string>
-    </property>
    </widget>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -130,74 +91,6 @@
      </item>
      <item row="0" column="1">
       <widget class="QSpinBox" name="learningRateBox"/>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>10</y>
-      <width>161</width>
-      <height>161</height>
-     </rect>
-    </property>
-    <property name="title">
-     <string>Weight analysis</string>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_15">
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_14">
-       <item>
-        <widget class="QLabel" name="labelWMax">
-         <property name="text">
-          <string>WMax: </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelWMin">
-         <property name="text">
-          <string>WMin: </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labeldWMax">
-         <property name="text">
-          <string>dWMax:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labeldWMin">
-         <property name="text">
-          <string>dWMin:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelUpdMax">
-         <property name="text">
-          <string>UpdMax:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelUpdMin">
-         <property name="text">
-          <string>UpdMin:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="labelRatio">
-         <property name="text">
-          <string>Ratio:</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </item>
     </layout>
    </widget>
@@ -364,18 +257,139 @@
      </property>
     </widget>
    </widget>
-   <widget class="QCheckBox" name="updWeightViz">
+   <widget class="QCustomPlot" name="lossplot" native="true">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>10</y>
+      <width>401</width>
+      <height>341</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QCustomPlot" name="accplot" native="true">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>360</y>
+      <width>401</width>
+      <height>311</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>10</y>
+      <width>254</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>Train</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stopButton">
+       <property name="text">
+        <string>Stop</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="resetButton">
+       <property name="text">
+        <string>Reset</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>410</x>
-      <y>180</y>
-      <width>161</width>
-      <height>20</height>
+      <y>10</y>
+      <width>171</width>
+      <height>205</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Update weight viz</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="title">
+        <string>Weight analysis</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_15">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_14">
+          <item>
+           <widget class="QLabel" name="labelWMax">
+            <property name="text">
+             <string>WMax: </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelWMin">
+            <property name="text">
+             <string>WMin: </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labeldWMax">
+            <property name="text">
+             <string>dWMax:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labeldWMin">
+            <property name="text">
+             <string>dWMin:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelUpdMax">
+            <property name="text">
+             <string>UpdMax:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelUpdMin">
+            <property name="text">
+             <string>UpdMin:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelRatio">
+            <property name="text">
+             <string>Ratio:</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="updWeightViz">
+       <property name="text">
+        <string>Update weight viz</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
@@ -389,13 +403,15 @@
    <zorder>groupBox</zorder>
    <zorder>groupBox_2</zorder>
    <zorder>updWeightViz</zorder>
+   <zorder>lossplot</zorder>
+   <zorder>accplot</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>832</width>
+     <width>1224</width>
      <height>19</height>
     </rect>
    </property>
@@ -417,6 +433,14 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

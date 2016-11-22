@@ -92,6 +92,45 @@ SimpleNetUI::SimpleNetUI(QWidget *parent) :
         ui->accLabel->setText("Accuracy: " + QString::number(acc));
     }
     visualizeWeights();
+
+
+    // Initialize plotting
+    // generate some data:
+    QVector<double> x(101), y(101); // initialize with entries 0..100
+    for (int i=0; i<101; ++i)
+    {
+      x[i] = i/50.0 - 1; // x goes from -1 to 1
+      y[i] = x[i]*x[i]; // let's plot a quadratic function
+    }
+    // create graph and assign data to it:
+
+    ui->lossplot->addGraph();
+    //ui->lossplot->graph(0)->setData(x, y);
+    // give the axes some labels:
+    ui->lossplot->xAxis->setLabel("Iteration");
+    ui->lossplot->yAxis->setLabel("Loss");
+//    // set axes ranges, so we see all data:
+//    ui->lossplot->xAxis->setRange(-1, 1);
+//    ui->lossplot->yAxis->setRange(0, 10);
+    ui->lossplot->replot();
+
+    ui->accplot->addGraph();
+    ui->accplot->graph(0)->setPen(QPen(Qt::green));
+    ui->accplot->graph(0)->setName("val");
+
+
+    ui->accplot->addGraph();
+    ui->accplot->graph(1)->setPen(QPen(Qt::blue));
+    ui->accplot->graph(1)->setName("train");
+    //ui->accplot->graph(0)->setData(x, y);
+    // give the axes some labels:
+    ui->accplot->xAxis->setLabel("Epoch");
+    ui->accplot->yAxis->setLabel("Accuracy");
+//    // set axes ranges, so we see all data:
+//    ui->accplot->xAxis->setRange(-1, 1);
+//    ui->accplot->yAxis->setRange(0, 10);
+    ui->accplot->replot();
+
 }
 
 SimpleNetUI::~SimpleNetUI()
@@ -245,8 +284,25 @@ float SimpleNetUI::evaluateAcc(){
     return correct/static_cast<float>(total);
 }
 
+float SimpleNetUI::evaluateTrainAcc(){
+
+    int correct = 0;
+    int total = 0;
+    for(int i=0; i<trainset.images_.size(); ++i){
+       int label = classifier->inference(trainset.images_[i]);
+       if(label == trainset.labels_[i]) correct++;
+       total++;
+    }
+    return correct/static_cast<float>(total);
+}
+
+
 void SimpleNetUI::on_pushButton_clicked()
 {
+    float maxloss = 0, maxacc = 0;
+    float minloss = 1e16, minacc = 101;
+    int true_iter = 0;
+    int true_epochs = 0;
     stopped_ = false;
     int bs = ui->bsBox->value();
     int iters = trainset.images_.size()/bs;
@@ -263,6 +319,9 @@ void SimpleNetUI::on_pushButton_clicked()
 
             float loss = classifier->loss(trainset.images_, trainset.labels_, trainset.get_batch_idxs(bs));
             std::cout << " Loss " << loss << std::endl;
+
+            maxloss = maxloss>loss ? maxloss : loss;
+            minloss = minloss<loss ? minloss : loss;
 
             ui->lossLabel->setText("Loss: " + QString::number(loss));
             if(ui->updWeightViz->isChecked()){
@@ -286,11 +345,39 @@ void SimpleNetUI::on_pushButton_clicked()
 
             //ui->labelRatio->setText("Ratio: " + QString::number(classifier->weight_ratio()));
 
+            loss_stats.push_back(loss);
+            iterations.push_back(true_iter);
+            true_iter++;
+
+            ui->lossplot->graph(0)->setData(iterations, loss_stats);
+            ui->lossplot->xAxis->setRange(0, true_iter);
+            ui->lossplot->yAxis->setRange(minloss, maxloss);
+            ui->lossplot->replot();
+
         }
 
         float acc = evaluateAcc();
         std::cout << "Accuracy " << acc << std::endl;
         ui->accLabel->setText("Accuracy: " + QString::number(acc));
+
+        float trainacc = evaluateTrainAcc();
+        std::cout << "Train Accuracy " << trainacc << std::endl;
+
+        maxacc = maxacc>acc ? maxacc : acc;
+        minacc = minacc<acc ? minacc : acc;
+        maxacc = maxacc>trainacc ? maxacc : trainacc;
+        minacc = minacc<trainacc ? minacc : trainacc;
+
+        val_acc_stats.push_back(acc);
+        train_acc_stats.push_back(trainacc);
+        epochs.push_back(true_epochs);
+        true_epochs++;
+
+        ui->accplot->graph(0)->setData(epochs,val_acc_stats);
+        ui->accplot->graph(1)->setData(epochs,train_acc_stats);
+        ui->accplot->xAxis->setRange(0, true_epochs);
+        ui->accplot->yAxis->setRange(minacc, maxacc);
+        ui->accplot->replot();
 
         if(classifier->saveWeights("weights.dat")){
             std::cout << "Weights has been saved." << std::endl;
@@ -325,6 +412,9 @@ void SimpleNetUI::on_resetButton_clicked()
 {
     classifier->initializeW();
     visualizeWeights();
+    val_acc_stats.clear();
+    train_acc_stats.clear();
+    loss_stats.clear();
 }
 
 void SimpleNetUI::on_learningRateBox_valueChanged(int lr_exp)
