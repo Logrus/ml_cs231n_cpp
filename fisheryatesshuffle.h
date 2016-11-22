@@ -4,6 +4,7 @@
 #include <vector>
 #include <random>
 #include <iostream>
+#include <numeric>
 
 /**
  * @brief The FisherYatesShuffle class

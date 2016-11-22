@@ -7,6 +7,7 @@
 #include <assert.h>
 #include "CMatrix.h"
 #include "classifier.h"
+#include <numeric>
 
 class LinearSoftmax : public Classifier
 {

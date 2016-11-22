@@ -17,7 +17,6 @@ set  (project_SOURCES main.cpp
                       mainwindow.cpp
                       cifar_reader.cpp
                       linearsvm.cpp
-                      aux.cpp
                       linearsoftmax.cpp
                       classifier.cpp
                       simpleneuralnet.cpp
@@ -27,7 +26,6 @@ set  (project_HEADERS mainwindow.h
                       linearsvm.h
                       CMatrix.h
                       CVector.h
-                      aux.h
                       linearsoftmax.h
                       classifier.h
                       simpleneuralnet.h
