@@ -5,8 +5,8 @@ I developed them for vizualization and understanding while doing CS231n from Sta
 
 This project contains:
 
-1. Implementation of the SVM and Softmax loss
-2. Implementation of the 2 layer neural network
+1. Implementation of the SVM and Softmax loss [video](https://www.youtube.com/watch?v=QrRTKM8xJaA)
+2. Implementation of the 2 layer neural network [video](https://www.youtube.com/watch?v=CHpu8N18aRs)
 3. Multiple normalization possibilities (mean subtraction, normalization, standartization)
 4. Adam weight update
 5. Fisher–Yates shuffle algorithm for batching
