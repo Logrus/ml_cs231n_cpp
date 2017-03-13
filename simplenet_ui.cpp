@@ -75,8 +75,13 @@ SimpleNetUI::SimpleNetUI(QWidget *parent) :
     TableWidget->setColumnCount(7);
     TableWidget->horizontalHeader()->setDefaultSectionSize(100);
     TableWidget->verticalHeader()->setDefaultSectionSize(100);
+#ifdef Qt4_FOUND  
     TableWidget->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
     TableWidget->verticalHeader()->setResizeMode(QHeaderView::Fixed);
+#else
+    TableWidget->horizontalHeader()-> setSectionResizeMode(QHeaderView::Fixed);
+    TableWidget->verticalHeader()-> setSectionResizeMode(QHeaderView::Fixed);
+#endif
     TableWidget->resize(801, 321);
     TableWidget->move(10, 400);
 

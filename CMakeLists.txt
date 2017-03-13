@@ -11,7 +11,7 @@ endif()
 
 set  (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-find_package (Qt4 REQUIRED)
+
 
 set  (project_SOURCES main.cpp
                       mainwindow.cpp
@@ -33,13 +33,23 @@ set  (project_HEADERS mainwindow.h
 set  (project_FORMS   mainwindow.ui)
 
 
-QT4_WRAP_CPP (project_HEADERS_MOC   ${project_HEADERS})
-QT4_WRAP_UI  (project_FORMS_HEADERS ${project_FORMS})
+find_package (Qt4 MODULE)
+if(Qt4_FOUND)
+  QT4_WRAP_CPP (project_HEADERS_MOC   ${project_HEADERS})
+  QT4_WRAP_UI  (project_FORMS_HEADERS ${project_FORMS})
+  include         (${QT_USE_FILE})
+  add_definitions (${QT_DEFINITIONS})
+else(Qt4_FOUND)
+  find_package (Qt5Core )
+  find_package (Qt5Widgets )
+  find_package (Qt5Gui )
+  find_package (Qt5PrintSupport )
+  QT5_WRAP_CPP (project_HEADERS_MOC   ${project_HEADERS})
+  QT5_WRAP_UI  (project_FORMS_HEADERS ${project_FORMS})
+  set(QT_LIBRARIES Qt5::Widgets Qt5::Core Qt5::Gui)
+endif(Qt4_FOUND)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-include         (${QT_USE_FILE})
-add_definitions (${QT_DEFINITIONS})
 
 add_executable  (${PROJECT_NAME} ${project_SOURCES}
                                  ${project_FORMS_HEADERS}
@@ -61,11 +71,23 @@ set(net_HEADERS simplenet_ui.h
                 qcustomplot.h)
 set(net_FORMS   simplenet_ui.ui)
 
-QT4_WRAP_CPP (net_HEADERS_MOC   ${net_HEADERS})
-QT4_WRAP_UI  (net_FORMS_HEADERS ${net_FORMS})
+if(Qt4_FOUND)
+  QT4_WRAP_CPP (net_HEADERS_MOC   ${net_HEADERS})
+  QT4_WRAP_UI  (net_FORMS_HEADERS ${net_FORMS})
+else(Qt4_FOUND)
+  QT5_WRAP_CPP (net_HEADERS_MOC   ${net_HEADERS})
+  QT5_WRAP_UI  (net_FORMS_HEADERS ${net_FORMS})
+  set(QT_LIBRARIES Qt5::Widgets Qt5::Core Qt5::Gui Qt5::PrintSupport)
+endif(Qt4_FOUND)
+
+add_custom_target(copy_custom_plot ALL
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/qcustomplot.h ${CMAKE_CURRENT_BINARY_DIR}
+)
 
 add_executable(simple_net ${net_SOURCES} ${net_HEADERS_MOC} ${net_FORMS_HEADERS})
 target_link_libraries (simple_net ${QT_LIBRARIES})
+add_dependencies(simple_net copy_custom_plot)
+
 
 add_executable(test_fisheryatesshuffle test_fisheryatesshuffle.cpp fisheryatesshuffle.cpp)
 add_executable(test_simpleneuralnetwork test_simpleneuralnetwork.cpp simpleneuralnet.cpp)
