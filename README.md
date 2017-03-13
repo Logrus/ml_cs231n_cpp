@@ -1,7 +1,7 @@
 # ml_cs231n_cpp
 
-This repo contains my c++ implementation of the SVM and Softmax loss functions in addition to the simple two-layer Neural Network.
-I developed them for vizualization and understanding while doing CS231n from Stanford University course in 2016.
+This repo contains C++ implementation of the SVM and Softmax loss functions in addition to the simple two-layer Neural Network.
+They were developed for vizualization and understanding while doing CS231n from Stanford University in 2016.
 
 This project contains:
 
