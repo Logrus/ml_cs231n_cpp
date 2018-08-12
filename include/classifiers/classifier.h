@@ -7,36 +7,35 @@
 /**
  * @brief The Abstract Base Classifier class
  */
-class Classifier
-{
-public:
+class Classifier {
+ public:
+  Classifier(const int classes, const int dimentionality);
 
-    Classifier(int classes, int dimentionality);
+  // Pure virtuals
+  virtual float L2W_reg() = 0;
+  virtual float loss_one_image(const std::vector<float>& image, const int& y) = 0;
+  virtual float loss(const std::vector<std::vector<float> >& images, const std::vector<int>& labels,
+                     const std::vector<size_t>& indexies) = 0;
+  virtual int inference(const std::vector<float>& image) = 0;
+  virtual std::vector<float> inference_loss(const std::vector<float>& image, const int& y) = 0;
 
-    // Pure virtuals
-    virtual float L2W_reg() = 0;
-    virtual float loss_one_image(const std::vector<float> &image, const int &y) = 0;
-    virtual float loss(const std::vector< std::vector<float> > &images, const std::vector<int> &labels, const std::vector<int> &indexies) = 0;
-    virtual int inference(const std::vector<float> &image) = 0;
-    virtual std::vector<float> inference_loss(const std::vector<float> &image, const int &y) = 0;
+  // Virtuals
+  virtual void initializeW();
+  virtual void copyW(const CMatrix<float> W);
+  virtual std::vector<float> scores(const std::vector<float>& image);
 
-    // Virtuals
-    virtual void initializeW();
-    virtual void copyW(const CMatrix<float> W);
-    virtual std::vector<float> scores(const std::vector<float> &image);
+  float weight_ratio();
 
-    float weight_ratio();
+  CMatrix<float> W;
+  CMatrix<float> dW;
 
-    CMatrix<float> W;
-    CMatrix<float> dW;
+  int C;  // classes
+  int D;  // data dimentionality
 
-    int C; // classes
-    int D; // data dimentionality
+  float lambda;
+  float learning_rate;
 
-    float lambda;
-    float learning_rate;
-
-    virtual ~Classifier() {};
+  virtual ~Classifier(){};
 };
 
-#endif // CLASSIFIER_H
+#endif  // CLASSIFIER_H

@@ -1,10 +1,10 @@
 #ifndef FISHERYATESSHUFFLE_H
 #define FISHERYATESSHUFFLE_H
 #include <algorithm>
-#include <vector>
-#include <random>
 #include <iostream>
 #include <numeric>
+#include <random>
+#include <vector>
 
 /**
  * @brief The FisherYatesShuffle class
@@ -14,22 +14,20 @@
  * http://stackoverflow.com/a/196065
  */
 
-class FisherYatesShuffle
-{
-public:
-    FisherYatesShuffle() {} // Default constructor
-    FisherYatesShuffle(int n_elements);
+class FisherYatesShuffle {
+ public:
+  FisherYatesShuffle() {}  // Default constructor
+  FisherYatesShuffle(const size_t n_elements);
 
-    void set_nelem(int n_elements);
+  void set_nelem(const size_t n_elements);
 
-    std::vector<int> get_random_indexies(int n);
+  std::vector<size_t> get_random_indexies(int n);
 
-    void swap(int &a, int &b);
-
-private:
-    std::vector<int> indexies_;
-    int max_, n_elements_;
-    std::random_device r_;
+ private:
+  void swap(size_t& a, size_t& b);
+  std::vector<size_t> indexies_;
+  size_t max_, n_elements_;
+  std::random_device r_;
 };
 
-#endif // FISHERYATESSHUFFLE_H
+#endif  // FISHERYATESSHUFFLE_H
