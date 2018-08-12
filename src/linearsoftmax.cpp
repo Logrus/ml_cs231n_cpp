@@ -77,12 +77,12 @@ float LinearSoftmax::loss(const std::vector<std::vector<float> >& images,
 
   // Compute loss for all images
   float L = 0;
-  int N = indexies.size();  // N images in batch
-  for (int i = 0; i < N; ++i) {
+  size_t N = indexies.size();  // N images in batch
+  for (size_t i = 0; i < N; ++i) {
     L += loss_one_image(images[indexies[i]], labels[indexies[i]]);
   }
-  L /= N;
-  L += 0.5 * lambda * L2W_reg();
+  L /= static_cast<float>(N);
+  L += 0.5f * lambda * L2W_reg();
 
   // Normalize and regularize gradient
   for (int x = 0; x < dW.xSize(); ++x) {

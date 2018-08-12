@@ -18,7 +18,7 @@ enum class PreprocessingType : unsigned {
 class CIFAR10Reader {
  public:
   CIFAR10Reader() : state_(PreprocessingType::NO_PREPROCESSING) {}
-  bool read_bin(std::string filepath, bool bias_trick);
+  bool read_bin(std::string filepath, const bool bias_trick);
 
   // Data processing
   void compute_mean();

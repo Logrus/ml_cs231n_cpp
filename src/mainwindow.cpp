@@ -19,37 +19,11 @@ MainWindow::MainWindow(QWidget* parent)
   label_names.push_back("ship");
   label_names.push_back("truck");
 
-  QDir dir("../CIFAR10/");
-
-  if (!dir.exists()) {
-    return;
-  }
-
-  dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-  QStringList filters;
-  filters << "data_batch_1.bin";
-  filters << "data_batch_2.bin";
-  filters << "data_batch_3.bin";
-  filters << "data_batch_4.bin";
-  filters << "data_batch_5.bin";
-  dir.setNameFilters(filters);
-
-  foreach (QFileInfo mitm, dir.entryInfoList()) {
-    trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
-  }
-
-  filters.clear();
-  filters << "test_batch.bin";
-  dir.setNameFilters(filters);
-  foreach (QFileInfo mitm, dir.entryInfoList()) {
-    testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
-  }
-
   // Ui init
   // Learning rate
   ui->learningRateBox->setRange(0, 22);
   ui->learningRateBox->setSingleStep(1);
-  ui->learningRateBox->setValue(abs(log10(classifier->learning_rate)));
+  ui->learningRateBox->setValue(static_cast<int>(abs(log10(classifier->learning_rate))));
 
   // Epochs
   ui->iterBox->setRange(1, 999);
@@ -62,17 +36,10 @@ MainWindow::MainWindow(QWidget* parent)
   // Regularization
   ui->regBox->setDecimals(22);
   ui->regBox->setSingleStep(0.00001);
-  ui->regBox->setValue(classifier->lambda);
-
-  updateImage();
-
-  visualizeWeights();
+  ui->regBox->setValue(static_cast<double>(classifier->lambda));
 }
 
-MainWindow::~MainWindow() {
-  delete ui;
-  delete classifier;
-}
+MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::updateImage() {
   int index = ui->labelSpinBox->value();
@@ -236,9 +203,13 @@ float MainWindow::evaluateAcc() {
 }
 
 void MainWindow::on_pushButton_clicked() {
+  if (trainset.images().empty()) {
+    std::cerr << "Training set is empty! Unable to start training." << std::endl;
+  }
+
   stopped_ = false;
   int bs = ui->bsBox->value();
-  int iters = trainset.images().size() / bs;
+  int iters = static_cast<int>(trainset.images().size()) / bs;
   for (int epoch = 0; epoch < ui->iterBox->value(); epoch++) {
     for (int i = 0; i < iters; ++i) {
       float loss =
@@ -288,16 +259,14 @@ void MainWindow::on_learningRateBox_valueChanged(int lr_exp) {
 
 void MainWindow::on_SVMRadioButton_clicked() {
   gW = classifier->W;
-  delete classifier;
-  classifier = new LinearSVM(10, 3073);
+  classifier.reset(new LinearSVM(10, 3073));
   classifier->copyW(gW);
   visualizeWeights();
 }
 
 void MainWindow::on_SoftmaxRadioButton_clicked() {
   gW = classifier->W;
-  delete classifier;
-  classifier = new LinearSoftmax(10, 3073);
+  classifier.reset(new LinearSoftmax(10, 3073));
   classifier->copyW(gW);
   visualizeWeights();
 }

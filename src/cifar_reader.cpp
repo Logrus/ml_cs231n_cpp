@@ -1,6 +1,14 @@
 #include <classifiers/cifar_reader.h>
 
-bool CIFAR10Reader::read_bin(const std::string filepath, bool bias_trick = false) {
+namespace {
+/// Defined for CIFAR10
+constexpr size_t kNumOfChannels = 3;
+constexpr int kNumberOfImages = 10000;
+constexpr int KNRows = 32;
+constexpr int KNCols = 32;
+}  // namespace
+
+bool CIFAR10Reader::read_bin(const std::string filepath, const bool bias_trick = false) {
   std::cout << "Reading " << filepath << std::endl;
 
   std::ifstream file(filepath.c_str(), std::ios::binary);
@@ -9,22 +17,19 @@ bool CIFAR10Reader::read_bin(const std::string filepath, bool bias_trick = false
     return false;
   }
 
-  const int number_of_images = 10000;
-  const int n_rows = 32;
-  const int n_cols = 32;
-  for (int i = 0; i < number_of_images; ++i) {
+  for (int i = 0; i < kNumberOfImages; ++i) {
     // read label for the image
-    char tplabel = 0;
-    file.read(static_cast<char*>(&tplabel), sizeof(tplabel));
+    unsigned char tplabel = 0;
+    file.read(reinterpret_cast<char*>(&tplabel), sizeof(tplabel));
     // push to the vector of labels
     labels_.push_back(static_cast<int>(tplabel));
 
     std::vector<float> picture;
-    for (size_t channel = 0; channel < 3; ++channel) {
-      for (size_t x = 0; x < n_rows; ++x) {
-        for (size_t y = 0; y < n_cols; ++y) {
-          char temp = 0;
-          file.read(static_cast<char*>(&temp), sizeof(temp));
+    for (size_t channel = 0; channel < kNumOfChannels; ++channel) {
+      for (size_t x = 0; x < KNRows; ++x) {
+        for (size_t y = 0; y < KNCols; ++y) {
+          unsigned char temp = 0;
+          file.read(reinterpret_cast<char*>(&temp), sizeof(temp));
           picture.push_back(static_cast<int>(temp));
         }
       }
@@ -46,29 +51,29 @@ bool CIFAR10Reader::read_bin(const std::string filepath, bool bias_trick = false
 void CIFAR10Reader::compute_mean() {
   std::cout << "Computing mean image" << std::endl;
   // Compute mean image
-  mean_image_.resize(images_copy_[0].size());
-  std::fill(mean_image_.begin(), mean_image_.end(), 0.0f);
-  for (size_t i = 0; i < images_.size(); ++i) {
-    const std::vector<float>& image = images_[i];
-    for (size_t d = 0; d < image.size(); ++d) {
-      mean_image_[d] += image.at(d);
+  mean_image_.resize(images_[0].size(), 0.f);
+
+  const float num_images = static_cast<float>(images_.size());
+  for (const auto& image : images_) {
+    for (size_t pix = 0; pix < image.size(); ++pix) {
+      mean_image_[pix] += image.at(pix) / num_images;
     }
-  }
-  for (size_t d = 0; d < mean_image_.size(); ++d) {
-    mean_image_[d] /= static_cast<float>(images_copy_.size());
   }
 }
 
 void CIFAR10Reader::compute_std() {
   std::cout << "Computing std image" << std::endl;
-  // Compute mean image
-  std_image_.resize(images_copy_[0].size());
-  std::fill(std_image_.begin(), std_image_.end(), 0.0f);
-  for (size_t i = 0; i < images_.size(); ++i) {
-    const std::vector<float>& image = images_[i];
-    for (size_t d = 0; d < image.size(); ++d) {
-      float diff = (image.at(d) - mean_image_[d]);
-      std_image_[d] += diff * diff;
+  // Check mean image
+  if (mean_image_.empty() || mean_image_.size() != images_[0].size()) {
+    std::cerr << "Unable to compute standard deviation since mean image was not computed yet! "
+                 "Please call compute_mean() before"
+              << std::endl;
+  }
+  std_image_.resize(images_copy_[0].size(), 0.f);
+  for (const auto& image : images_) {
+    for (size_t pix = 0; pix < image.size(); ++pix) {
+      const float diff = (image.at(pix) - mean_image_.at(pix));
+      std_image_[pix] += diff * diff;
     }
   }
   for (size_t d = 0; d < std_image_.size(); ++d) {

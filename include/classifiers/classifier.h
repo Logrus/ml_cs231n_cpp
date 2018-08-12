@@ -32,8 +32,8 @@ class Classifier {
   int C;  // classes
   int D;  // data dimentionality
 
-  float lambda;
-  float learning_rate;
+  double lambda;
+  double learning_rate;
 
   virtual ~Classifier(){};
 };
