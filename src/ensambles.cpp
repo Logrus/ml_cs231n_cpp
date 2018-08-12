@@ -1,6 +1,6 @@
 #include <iostream>
-#include "simpleneuralnet.h"
-#include "cifar_reader.h"
+#include <classifiers/simpleneuralnet.h>
+#include <classifiers/cifar_reader.h>
 
 int main(){
 

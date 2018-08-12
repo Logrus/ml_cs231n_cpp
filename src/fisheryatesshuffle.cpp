@@ -1,4 +1,4 @@
-#include "fisheryatesshuffle.h"
+#include <classifiers/fisheryatesshuffle.h>
 
 FisherYatesShuffle::FisherYatesShuffle(int n_elements)
     : n_elements_(n_elements)

@@ -1,4 +1,4 @@
-#include "linearsvm.h"
+#include <classifiers/linearsvm.h>
 LinearSVM::LinearSVM(int classes, int dimentionality) :
     Classifier(classes, dimentionality)
 {

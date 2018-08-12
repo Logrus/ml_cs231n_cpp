@@ -1,4 +1,4 @@
-#include "simplenet_ui.h"
+#include <classifiers/simplenet_ui.h>
 #include <QApplication>
 
 int main(int argc, char *argv[])

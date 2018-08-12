@@ -3,7 +3,7 @@
 #include <unordered_set>
 #undef NDEBUG // Do assert always
 #include <assert.h>
-#include "fisheryatesshuffle.h"
+#include <classifiers/fisheryatesshuffle.h>
 
 int main(){
 

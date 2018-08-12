@@ -1,4 +1,4 @@
-#include "simplenet_ui.h"
+#include <classifiers/simplenet_ui.h>
 #include "ui_simplenet_ui.h"
 
 SimpleNetUI::SimpleNetUI(QWidget *parent) :

@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <assert.h>
 #include <numeric>
-#include "CMatrix.h"
+#include <uni_freiburg_cv/CMatrix.h>
 
 typedef std::vector< std::vector<float> > vvfloat;
 typedef std::vector<int> vint;

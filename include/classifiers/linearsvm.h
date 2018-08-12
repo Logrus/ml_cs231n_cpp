@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <assert.h>
-#include "CMatrix.h"
+#include <uni_freiburg_cv/CMatrix.h>
 #include "classifier.h"
 
 class LinearSVM : public Classifier

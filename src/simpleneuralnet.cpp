@@ -1,4 +1,4 @@
-#include "simpleneuralnet.h"
+#include <classifiers/simpleneuralnet.h>
 
 SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size, int output_size, float std) :
     input_size_(input_size), hidden_size_(hidden_size), output_size_(output_size), std_(std)

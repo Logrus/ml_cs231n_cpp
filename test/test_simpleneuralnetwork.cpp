@@ -3,7 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
-#include "simpleneuralnet.h"
+#include <classifiers/simpleneuralnet.h>
 
 int main(){
 

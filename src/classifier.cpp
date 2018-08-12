@@ -1,4 +1,4 @@
-#include "classifier.h"
+#include <classifiers/classifier.h>
 
 Classifier::Classifier(int classes, int dimentionality) :
     C(classes),

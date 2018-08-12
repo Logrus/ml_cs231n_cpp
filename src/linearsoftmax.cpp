@@ -1,4 +1,4 @@
-#include "linearsoftmax.h"
+#include <classifiers/linearsoftmax.h>
 
 LinearSoftmax::LinearSoftmax(int classes, int dimentionality) :
     Classifier(classes, dimentionality)

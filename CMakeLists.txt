@@ -9,28 +9,28 @@ if (${CMAKE_GENERATOR} MATCHES ".*Makefiles")
     endif()
 endif()
 
-set  (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set  (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 
 
-set  (project_SOURCES main.cpp
-                      mainwindow.cpp
-                      cifar_reader.cpp
-                      linearsvm.cpp
-                      linearsoftmax.cpp
-                      classifier.cpp
-                      simpleneuralnet.cpp
-                      fisheryatesshuffle.cpp)
-set  (project_HEADERS mainwindow.h
-                      cifar_reader.h
-                      linearsvm.h
-                      CMatrix.h
-                      CVector.h
-                      linearsoftmax.h
-                      classifier.h
-                      simpleneuralnet.h
-                      fisheryatesshuffle.h)
-set  (project_FORMS   mainwindow.ui)
+set  (project_SOURCES src/main.cpp
+                      src/mainwindow.cpp
+                      src/cifar_reader.cpp
+                      src/linearsvm.cpp
+                      src/linearsoftmax.cpp
+                      src/classifier.cpp
+                      src/simpleneuralnet.cpp
+                      src/fisheryatesshuffle.cpp)
+set  (project_HEADERS include/classifiers/mainwindow.h
+                      include/classifiers/cifar_reader.h
+                      include/classifiers/linearsvm.h
+                      3rdparty/uni_freiburg_cv/CMatrix.h
+                      3rdparty/uni_freiburg_cv/CVector.h
+                      include/classifiers/linearsoftmax.h
+                      include/classifiers/classifier.h
+                      include/classifiers/simpleneuralnet.h
+                      include/classifiers/fisheryatesshuffle.h)
+set  (project_FORMS   ui/mainwindow.ui)
 
 
 find_package (Qt4 MODULE)
@@ -49,7 +49,7 @@ else(Qt4_FOUND)
   set(QT_LIBRARIES Qt5::Widgets Qt5::Core Qt5::Gui)
 endif(Qt4_FOUND)
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(include 3rdparty ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable  (${PROJECT_NAME} ${project_SOURCES}
                                  ${project_FORMS_HEADERS}
@@ -58,18 +58,18 @@ add_executable  (${PROJECT_NAME} ${project_SOURCES}
 target_link_libraries (${PROJECT_NAME} ${QT_LIBRARIES})
 
 # Additional targets
-set(net_SOURCES simplenet_main.cpp
-                simplenet_ui.cpp
-                simpleneuralnet.cpp
-                cifar_reader.cpp
-                fisheryatesshuffle.cpp
-                qcustomplot.cpp)
-set(net_HEADERS simplenet_ui.h
-                simpleneuralnet.h
-                cifar_reader.h
-                fisheryatesshuffle.h
-                qcustomplot.h)
-set(net_FORMS   simplenet_ui.ui)
+set(net_SOURCES src/simplenet_main.cpp
+                src/simplenet_ui.cpp
+                src/simpleneuralnet.cpp
+                src/cifar_reader.cpp
+                src/fisheryatesshuffle.cpp
+                3rdparty/qcustomplot/qcustomplot.cpp)
+set(net_HEADERS include/classifiers/simplenet_ui.h
+                include/classifiers/simpleneuralnet.h
+                include/classifiers/cifar_reader.h
+                include/classifiers/fisheryatesshuffle.h
+                3rdparty/qcustomplot/qcustomplot.h)
+set(net_FORMS   ui/simplenet_ui.ui)
 
 if(Qt4_FOUND)
   QT4_WRAP_CPP (net_HEADERS_MOC   ${net_HEADERS})
@@ -81,7 +81,7 @@ else(Qt4_FOUND)
 endif(Qt4_FOUND)
 
 add_custom_target(copy_custom_plot ALL
-    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/qcustomplot.h ${CMAKE_CURRENT_BINARY_DIR}
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/3rdparty/qcustomplot/qcustomplot.h ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_executable(simple_net ${net_SOURCES} ${net_HEADERS_MOC} ${net_FORMS_HEADERS})
@@ -89,7 +89,7 @@ target_link_libraries (simple_net ${QT_LIBRARIES})
 add_dependencies(simple_net copy_custom_plot)
 
 
-add_executable(test_fisheryatesshuffle test_fisheryatesshuffle.cpp fisheryatesshuffle.cpp)
-add_executable(test_simpleneuralnetwork test_simpleneuralnetwork.cpp simpleneuralnet.cpp)
+add_executable(test_fisheryatesshuffle test/test_fisheryatesshuffle.cpp src/fisheryatesshuffle.cpp)
+add_executable(test_simpleneuralnetwork test/test_simpleneuralnetwork.cpp src/simpleneuralnet.cpp)
 
-add_executable(ensambles ensambles.cpp simpleneuralnet.cpp cifar_reader.cpp fisheryatesshuffle.cpp)
+add_executable(ensambles src/ensambles.cpp src/simpleneuralnet.cpp src/cifar_reader.cpp src/fisheryatesshuffle.cpp)

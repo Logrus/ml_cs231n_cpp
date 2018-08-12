@@ -1,30 +1,29 @@
-#ifndef SIMPLENET_UI_H
-#define SIMPLENET_UI_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 #include <QApplication>
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QDir>
-#include <QTableWidget>
-#include <QTableWidgetItem>
 #include <iostream>
 #include "cifar_reader.h"
-#include "simpleneuralnet.h"
-#include "CMatrix.h"
+#include "classifier.h"
+#include "linearsvm.h"
+#include "linearsoftmax.h"
+#include <uni_freiburg_cv/CMatrix.h>
 #include <math.h>
-#include "qcustomplot.h"
 
 namespace Ui {
-class SimpleNetUI;
+class MainWindow;
 }
 
-class SimpleNetUI : public QMainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit SimpleNetUI(QWidget *parent = 0);
-    ~SimpleNetUI();
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
     void updateImage();
 
 private slots:
@@ -40,6 +39,10 @@ private slots:
 
     void on_learningRateBox_valueChanged(int arg1);
 
+    void on_SVMRadioButton_clicked();
+
+    void on_SoftmaxRadioButton_clicked();
+
     void on_regBox_valueChanged(double arg1);
 
     void on_buttonMeanImage_clicked();
@@ -53,25 +56,17 @@ private slots:
 private:
     void visualizeWeights();
     float evaluateAcc();
-    float evaluateTrainAcc();
 
     std::vector<std::string> label_names;
 
-    Ui::SimpleNetUI *ui;
+    Ui::MainWindow *ui;
     CIFAR10Reader trainset;
     CIFAR10Reader testset;
-    SimpleNeuralNet * classifier;
-    QTableWidget* TableWidget;
+    Classifier * classifier;
 
     bool stopped_ = false;
 
-    QVector<double> loss_stats;
-    QVector<double> val_acc_stats;
-    QVector<double> train_acc_stats;
-    QVector<double> iterations;
-    QVector<double> epochs;
+    CMatrix<float> gW; // Global weights (just for fun!)
 };
 
-
-#endif // SIMPLENET_UI_H
-
+#endif // MAINWINDOW_H

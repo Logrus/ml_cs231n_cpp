@@ -1,4 +1,4 @@
-#include "cifar_reader.h"
+#include <classifiers/cifar_reader.h>
 
 bool CIFAR10Reader::read_bin(std::string filepath, bool bias_trick = false){
   

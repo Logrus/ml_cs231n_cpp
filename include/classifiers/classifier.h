@@ -1,6 +1,6 @@
 #ifndef CLASSIFIER_H
 #define CLASSIFIER_H
-#include "CMatrix.h"
+#include <uni_freiburg_cv/CMatrix.h>
 #include <chrono>
 #include <random>
 
