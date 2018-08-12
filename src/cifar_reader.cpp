@@ -46,33 +46,33 @@ bool CIFAR10Reader::read_bin(const std::string filepath, bool bias_trick = false
 void CIFAR10Reader::compute_mean() {
   std::cout << "Computing mean image" << std::endl;
   // Compute mean image
-  mean_image.resize(images_copy_[0].size());
-  std::fill(mean_image.begin(), mean_image.end(), 0.0f);
+  mean_image_.resize(images_copy_[0].size());
+  std::fill(mean_image_.begin(), mean_image_.end(), 0.0f);
   for (size_t i = 0; i < images_.size(); ++i) {
     const std::vector<float>& image = images_[i];
     for (size_t d = 0; d < image.size(); ++d) {
-      mean_image[d] += image.at(d);
+      mean_image_[d] += image.at(d);
     }
   }
-  for (size_t d = 0; d < mean_image.size(); ++d) {
-    mean_image[d] /= static_cast<float>(images_copy_.size());
+  for (size_t d = 0; d < mean_image_.size(); ++d) {
+    mean_image_[d] /= static_cast<float>(images_copy_.size());
   }
 }
 
 void CIFAR10Reader::compute_std() {
   std::cout << "Computing std image" << std::endl;
   // Compute mean image
-  std_image.resize(images_copy_[0].size());
-  std::fill(std_image.begin(), std_image.end(), 0.0f);
+  std_image_.resize(images_copy_[0].size());
+  std::fill(std_image_.begin(), std_image_.end(), 0.0f);
   for (size_t i = 0; i < images_.size(); ++i) {
-    const std::vector<float>* image = &images_[i];
-    for (size_t d = 0; d < image->size(); ++d) {
-      float diff = (image->at(d) - mean_image[d]);
-      std_image[d] += diff * diff;
+    const std::vector<float>& image = images_[i];
+    for (size_t d = 0; d < image.size(); ++d) {
+      float diff = (image.at(d) - mean_image_[d]);
+      std_image_[d] += diff * diff;
     }
   }
-  for (size_t d = 0; d < std_image.size(); ++d) {
-    std_image[d] = sqrtf(std_image[d] / images_.size());
+  for (size_t d = 0; d < std_image_.size(); ++d) {
+    std_image_[d] = sqrtf(std_image_[d] / images_.size());
   }
 }
 
@@ -96,8 +96,8 @@ void CIFAR10Reader::standardize() {
   for (size_t i = 0; i < images_.size(); ++i) {
     //        std::vector<float> *image = &images_[i];
     for (size_t d = 0; d < images_[0].size(); ++d) {
-      images_[i][d] -= mean_image[d];
-      images_[i][d] /= std_image[d] + 0.0001f;
+      images_[i][d] -= mean_image_[d];
+      images_[i][d] /= std_image_[d] + 0.0001f;
       if (max < images_[i][d]) max = images_[i][d];
       if (min > images_[i][d]) min = images_[i][d];
     }
@@ -113,11 +113,11 @@ void CIFAR10Reader::demean() {
   for (size_t i = 0; i < images_.size(); ++i) {
     std::vector<float>* image = &images_[i];
     for (size_t d = 0; d < image->size(); ++d) {
-      image->at(d) -= mean_image[d];
+      image->at(d) -= mean_image_[d];
     }
   }
   std::cout << "Subtracted mean from every image." << std::endl;
-  auto minmax = std::minmax_element(mean_image.begin(), mean_image.end());
+  auto minmax = std::minmax_element(mean_image_.begin(), mean_image_.end());
   std::cout << "Mean image min " << *minmax.first << " max " << *minmax.second << std::endl;
   state_ = PreprocessingType::DEMEANED;
 }
