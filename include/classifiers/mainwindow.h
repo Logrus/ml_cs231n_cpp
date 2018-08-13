@@ -14,9 +14,10 @@
 #include "linearsoftmax.h"
 #include "linearsvm.h"
 
+class QLabel;
 namespace Ui {
 class MainWindow;
-}
+}  // namespace Ui
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -63,6 +64,9 @@ class MainWindow : public QMainWindow {
   CIFAR10Reader trainset;
   CIFAR10Reader testset;
   std::unique_ptr<Classifier> classifier;
+
+  std::vector<QLabel*> ui_labels_score_;
+  std::vector<QLabel*> ui_labels_loss_;
 
   bool stopped_ = false;
 

@@ -1,23 +1,16 @@
 #include <classifiers/mainwindow.h>
 #include "ui_mainwindow.h"
 
+namespace {
+const std::vector<std::string> kCIFAR10Labels = {"plane", "car",  "bird",  "cat",  "deer",
+                                                 "dog",   "frog", "horse", "ship", "truck"};
+}
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), classifier(new LinearSVM(10, 3073)) {
   ui->setupUi(this);
 
   classifier->initializeW();
-
-  // TODO: remove later
-  label_names.push_back("plane");
-  label_names.push_back("car");
-  label_names.push_back("bird");
-  label_names.push_back("cat");
-  label_names.push_back("deer");
-  label_names.push_back("dog");
-  label_names.push_back("frog");
-  label_names.push_back("horse");
-  label_names.push_back("ship");
-  label_names.push_back("truck");
 
   // Ui init
   // Learning rate
@@ -37,12 +30,36 @@ MainWindow::MainWindow(QWidget* parent)
   ui->regBox->setDecimals(22);
   ui->regBox->setSingleStep(0.00001);
   ui->regBox->setValue(static_cast<double>(classifier->lambda));
+
+  // Gather ui elements into a vec
+  ui_labels_score_.push_back(ui->labelPlaneScore);
+  ui_labels_score_.push_back(ui->labelCarScore);
+  ui_labels_score_.push_back(ui->labelBirdScore);
+  ui_labels_score_.push_back(ui->labelCatScore);
+  ui_labels_score_.push_back(ui->labelDeerScore);
+  ui_labels_score_.push_back(ui->labelDogScore);
+  ui_labels_score_.push_back(ui->labelFrogScore);
+  ui_labels_score_.push_back(ui->labelHorseScore);
+  ui_labels_score_.push_back(ui->labelShipScore);
+  ui_labels_score_.push_back(ui->labelTruckScore);
+
+  ui_labels_loss_.push_back(ui->labelPlaneLoss);
+  ui_labels_loss_.push_back(ui->labelCarLoss);
+  ui_labels_loss_.push_back(ui->labelBirdLoss);
+  ui_labels_loss_.push_back(ui->labelCatLoss);
+  ui_labels_loss_.push_back(ui->labelDeerLoss);
+  ui_labels_loss_.push_back(ui->labelDogLoss);
+  ui_labels_loss_.push_back(ui->labelFrogLoss);
+  ui_labels_loss_.push_back(ui->labelHorseLoss);
+  ui_labels_loss_.push_back(ui->labelShipLoss);
+  ui_labels_loss_.push_back(ui->labelTruckLoss);
 }
 
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::updateImage() {
   const size_t index = static_cast<size_t>(ui->labelSpinBox->value());
+  if (index >= trainset.images().size()) return;
   const auto cifar_image = trainset.getImage(index);
   QImage img(cifar_image.width(), cifar_image.height(), QImage::Format_RGB888);
   for (size_t x = 0; x < cifar_image.width(); ++x) {
@@ -55,36 +72,25 @@ void MainWindow::updateImage() {
   }
   img = img.scaled(ui->piclabel->width(), ui->piclabel->height(), Qt::KeepAspectRatio);
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
-  ui->labelLineEdit->setText(QString::fromStdString(label_names[trainset.labels()[index]]));
+  img =
+      img.scaled(ui->piclabel_zoomed->width(), ui->piclabel_zoomed->height(), Qt::KeepAspectRatio);
+  ui->piclabel_zoomed->setPixmap(QPixmap::fromImage(img));
+  ui->labelLineEdit->setText(QString::fromStdString(kCIFAR10Labels[trainset.labels()[index]]));
 
   std::vector<float> scores = classifier->scores(trainset.images()[index]);
   int predicted_label = classifier->inference(trainset.images()[index]);
-  ui->predictionLineEdit->setText(QString::fromStdString(label_names[predicted_label]));
+  ui->predictionLineEdit->setText(QString::fromStdString(kCIFAR10Labels[predicted_label]));
 
-  ui->labelPlaneScore->setText(QString::number(scores[0], 10, 5));
-  ui->labelCarScore->setText(QString::number(scores[1], 10, 5));
-  ui->labelBirdScore->setText(QString::number(scores[2], 10, 5));
-  ui->labelCatScore->setText(QString::number(scores[3], 10, 5));
-  ui->labelDeerScore->setText(QString::number(scores[4], 10, 5));
-  ui->labelDogScore->setText(QString::number(scores[5], 10, 5));
-  ui->labelFrogScore->setText(QString::number(scores[6], 10, 5));
-  ui->labelHorseScore->setText(QString::number(scores[7], 10, 5));
-  ui->labelShipScore->setText(QString::number(scores[8], 10, 5));
-  ui->labelTruckScore->setText(QString::number(scores[9], 10, 5));
+  for (size_t i = 0; i < ui_labels_score_.size(); ++i) {
+    ui_labels_score_[i]->setText(QString::number(static_cast<double>(scores[i]), 10, 5));
+  }
 
   // Evaluate loss vector
   std::vector<float> loss_vec =
       classifier->inference_loss(trainset.images()[index], trainset.labels()[index]);
-  ui->labelPlaneLoss->setText(QString::number(loss_vec[0], 10, 5));
-  ui->labelCarLoss->setText(QString::number(loss_vec[1], 10, 5));
-  ui->labelBirdLoss->setText(QString::number(loss_vec[2], 10, 5));
-  ui->labelCatLoss->setText(QString::number(loss_vec[3], 10, 5));
-  ui->labelDeerLoss->setText(QString::number(loss_vec[4], 10, 5));
-  ui->labelDogLoss->setText(QString::number(loss_vec[5], 10, 5));
-  ui->labelFrogLoss->setText(QString::number(loss_vec[6], 10, 5));
-  ui->labelHorseLoss->setText(QString::number(loss_vec[7], 10, 5));
-  ui->labelShipLoss->setText(QString::number(loss_vec[8], 10, 5));
-  ui->labelTruckLoss->setText(QString::number(loss_vec[9], 10, 5));
+  for (size_t i = 0; i < ui_labels_loss_.size(); ++i) {
+    ui_labels_loss_[i]->setText(QString::number(static_cast<double>(loss_vec[i]), 10, 5));
+  }
 }
 
 void MainWindow::on_actionOpen_dataset_triggered() {
@@ -194,7 +200,7 @@ void MainWindow::visualizeWeights() {
 float MainWindow::evaluateAcc() {
   int correct = 0;
   int total = 0;
-  for (int i = 0; i < testset.images().size(); ++i) {
+  for (size_t i = 0; i < testset.images().size(); ++i) {
     int label = classifier->inference(testset.images()[i]);
     if (label == testset.labels()[i]) correct++;
     total++;
