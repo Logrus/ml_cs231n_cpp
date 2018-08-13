@@ -42,14 +42,15 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::updateImage() {
-  int index = ui->labelSpinBox->value();
-  QImage img(32, 32, QImage::Format_RGB888);
-  for (int x = 0; x < 32; ++x) {
-    for (int y = 0; y < 32; ++y) {
-      int red = trainset.images()[index][y * 32 + x];
-      int green = trainset.images()[index][1024 + y * 32 + x];
-      int blue = trainset.images()[index][2048 + y * 32 + x];
-      img.setPixel(x, y, qRgb(red, green, blue));
+  const size_t index = static_cast<size_t>(ui->labelSpinBox->value());
+  const auto cifar_image = trainset.getImage(index);
+  QImage img(cifar_image.width(), cifar_image.height(), QImage::Format_RGB888);
+  for (size_t x = 0; x < cifar_image.width(); ++x) {
+    for (size_t y = 0; y < cifar_image.height(); ++y) {
+      int red = cifar_image(x, y, Image::Channel::RED);
+      int green = cifar_image(x, y, Image::Channel::GREEN);
+      int blue = cifar_image(x, y, Image::Channel::BLUE);
+      img.setPixel(static_cast<int>(x), static_cast<int>(y), qRgb(red, green, blue));
     }
   }
   img = img.scaled(ui->piclabel->width(), ui->piclabel->height(), Qt::KeepAspectRatio);
