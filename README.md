@@ -17,3 +17,37 @@ This project contains:
 
 ## Two layer Neural Network
 ![twolayernetwork](https://github.com/Logrus/ml_cs231n_cpp/raw/master/images/two_layer_nn_viz.png)
+
+# Dependencies
+
+The project depends on having either Qt4 or Qt5 lib.
+It was tested on Ubuntu 18.04 LTS with g++ 7.3.0
+
+# Clone & Build
+
+The build should go as usual with CMake
+
+```
+git clone https://github.com/Logrus/ml_cs231n_cpp.git
+cd ml_cs231n_cpp
+mkdir build
+cd build
+cmake ..
+make
+```
+# Run
+Before you can experiment, you should upload CIFAR10 dataset by running a script:
+```
+# From ml_cs231n_cpp folder
+./get_datasets.sh
+```
+It will create a `data/CIFAR10` folder in the current root and download binaries to that folder.
+
+Don't hesitate to change `get_datasets.sh` script if you want to download files to another place.
+
+After compilation you can SVM and Softmax visualizations:
+```
+# From build folder call
+./visualizer
+```
+In the open window click on `Open dataset` button and specify path to CIFAR10 folder (e.g. ml_cs231n_cpp/data/CIFAR10).
