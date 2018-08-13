@@ -41,9 +41,9 @@ Before you can experiment, you should upload CIFAR10 dataset by running a script
 # From ml_cs231n_cpp folder
 ./get_datasets.sh
 ```
-It will create a `data/CIFAR10` folder in the current root and download binaries to that folder.
+It will create a `data/CIFAR10` folder in the current folder and download bin files to CIFAR10 folder.
 
-Don't hesitate to change `get_datasets.sh` script if you want to download files to another place.
+Note: Don't hesitate to change `get_datasets.sh` script if you want to download files to another place.
 
 After compilation you can SVM and Softmax visualizations:
 ```
