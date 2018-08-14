@@ -485,10 +485,16 @@
     <item row="0" column="0">
      <widget class="QGroupBox" name="groupBox_2">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>1</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>255</width>
+        <height>280</height>
+       </size>
       </property>
       <property name="title">
        <string>Image preview</string>
@@ -701,6 +707,18 @@
     </item>
     <item row="0" column="3">
      <widget class="QGroupBox" name="groupBox">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>180</width>
+        <height>280</height>
+       </size>
+      </property>
       <property name="title">
        <string>Weight analysis</string>
       </property>
