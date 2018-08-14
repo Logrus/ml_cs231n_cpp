@@ -23,22 +23,19 @@ bool CIFAR10Reader::readBin(const std::string filepath, const bool bias_trick = 
     unsigned char tplabel = 0;
     file.read(reinterpret_cast<char*>(&tplabel), sizeof(tplabel));
     // push to the vector of labels
-    labels_.push_back(static_cast<int>(tplabel));
+    labels_.emplace_back(tplabel);
 
-    std::vector<float> picture;
-    for (size_t channel = 0; channel < kNumOfChannels; ++channel) {
-      for (size_t x = 0; x < KNRows; ++x) {
-        for (size_t y = 0; y < KNCols; ++y) {
-          unsigned char temp = 0;
-          file.read(reinterpret_cast<char*>(&temp), sizeof(temp));
-          picture.push_back(static_cast<int>(temp));
-        }
-      }
+    std::array<char, kNumOfChannels * KNRows * KNCols> buffer;
+    file.read(buffer.data(), buffer.size());
+    if (!file.good()) {
+      std::cerr << "Error while reading CIFAR10 dataset!" << std::endl;
+      return false;
     }
+    std::vector<float> picture(buffer.cbegin(), buffer.cend());
     if (bias_trick) {
-      picture.push_back(1);  // Bias trick
+      picture.emplace_back(1);  // Bias trick
     }
-    images_.push_back(picture);
+    images_.push_back(std::move(picture));
   }
   file.close();
 
