@@ -10,21 +10,21 @@
 
 class LinearSVM : public Classifier {
  public:
-  LinearSVM(int, int);
+  LinearSVM(const unsigned, const unsigned);
 
   /**
    * @brief Computes SVM L2 regularization term W^2
    * @return float representing elementwise sum of squares of weight matrix elements
    */
-  float L2W_reg();
+  float weightRegularizationL2() const override;
 
-  float loss_one_image(const std::vector<float>& image, const int& y);
-  float loss(const std::vector<std::vector<float> >& images, const std::vector<int>& labels,
-             const std::vector<size_t>& indexies) override;
+  float lossForSingleImage(const std::vector<float>& image, const int& y) override;
+  float computeLoss(const std::vector<std::vector<float> >& images, const std::vector<int>& labels,
+                    const std::vector<size_t>& indexies) override;
 
-  int inference(const std::vector<float>& image);
+  int infer(const std::vector<float>& image) const override;
 
-  std::vector<float> inference_loss(const std::vector<float>& image, const int& y);
+  std::vector<float> inferenceLoss(const std::vector<float>& image, const size_t y) const override;
 };
 
 #endif  // LINEARSVM_H

@@ -1,17 +1,17 @@
 #include <classifiers/fisheryatesshuffle.h>
 
 FisherYatesShuffle::FisherYatesShuffle(const size_t n_elements) : n_elements_(n_elements) {
-  set_nelem(n_elements_);
+  setNelem(n_elements_);
 }
 
-void FisherYatesShuffle::set_nelem(const size_t n_elements) {
+void FisherYatesShuffle::setNelem(const size_t n_elements) {
   n_elements_ = n_elements;
   // Initialize internal vector from 0 to n_elements-1
   indexies_.resize(n_elements_);
   std::iota(indexies_.begin(), indexies_.end(), 0);
 }
 
-std::vector<size_t> FisherYatesShuffle::get_random_indexies(int n) {
+std::vector<size_t> FisherYatesShuffle::getRandomIndexies(const int n) {
   std::vector<size_t> result;
   for (int i = n; i != 0; --i) {
     // If we reached the end of unique elements, reinit alg

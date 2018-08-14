@@ -12,7 +12,7 @@ int main() {
   std::unordered_set<size_t> test_set;
 
   for (int i = 0; i < 5; i++) {
-    res = shuffler.get_random_indexies(500);
+    res = shuffler.getRandomIndexies(500);
 
     for (auto a : res) {
       assert(test_set.find(a) == test_set.end());

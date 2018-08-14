@@ -16,12 +16,12 @@
 
 class FisherYatesShuffle {
  public:
-  FisherYatesShuffle() {}  // Default constructor
+  FisherYatesShuffle() {}
   FisherYatesShuffle(const size_t n_elements);
 
-  void set_nelem(const size_t n_elements);
+  void setNelem(const size_t n_elements);
 
-  std::vector<size_t> get_random_indexies(int n);
+  std::vector<size_t> getRandomIndexies(const int n);
 
  private:
   void swap(size_t& a, size_t& b);

@@ -22,6 +22,7 @@ enum class PreprocessingType : unsigned {
 class Image {
  public:
   enum class Channel : unsigned { RED = 0, GREEN, BLUE };
+
   Image(const size_t width, const size_t height, const size_t channels)
       : width_(width), height_(height), channels_(channels) {}
   Image(const std::vector<float>& float_image, const size_t width, const size_t height,
@@ -52,11 +53,11 @@ class Image {
 class CIFAR10Reader {
  public:
   CIFAR10Reader() : state_(PreprocessingType::NO_PREPROCESSING) {}
-  bool read_bin(std::string filepath, const bool bias_trick);
+  bool readBin(std::string filepath, const bool bias_trick);
 
   // Data processing
-  void compute_mean();
-  void compute_std();
+  void computeMean();
+  void computeStd();
   void normalize();
   void standardize();
   void demean();
@@ -71,10 +72,10 @@ class CIFAR10Reader {
 
   std::pair<float, float> minmax();
 
-  std::vector<size_t> get_batch_idxs(int batch_size) const;
+  std::vector<size_t> getBatchIdxs(int batch_size) const;
 
-  const std::vector<float>& std_image() const { return std_image_; }
-  const std::vector<float>& mean_image() const { return mean_image_; }
+  const std::vector<float>& stdImage() const { return std_image_; }
+  const std::vector<float>& meanImage() const { return mean_image_; }
   const std::vector<int>& labels() const { return labels_; }
   const std::vector<std::vector<float>>& images() const { return images_; }
 

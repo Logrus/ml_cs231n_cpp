@@ -9,7 +9,7 @@ constexpr int KNRows = 32;
 constexpr int KNCols = 32;
 }  // namespace
 
-bool CIFAR10Reader::read_bin(const std::string filepath, const bool bias_trick = false) {
+bool CIFAR10Reader::readBin(const std::string filepath, const bool bias_trick = false) {
   std::cout << "Reading " << filepath << std::endl;
 
   std::ifstream file(filepath.c_str(), std::ios::binary);
@@ -42,14 +42,14 @@ bool CIFAR10Reader::read_bin(const std::string filepath, const bool bias_trick =
   }
   file.close();
 
-  shuffler.set_nelem(images_.size());
+  shuffler.setNelem(images_.size());
 
   images_copy_ = images_;
 
   return true;
 }
 
-void CIFAR10Reader::compute_mean() {
+void CIFAR10Reader::computeMean() {
   std::cout << "Computing mean image" << std::endl;
   // Compute mean image
   mean_image_.resize(images_.front().size(), 0.f);
@@ -62,7 +62,7 @@ void CIFAR10Reader::compute_mean() {
   }
 }
 
-void CIFAR10Reader::compute_std() {
+void CIFAR10Reader::computeStd() {
   std::cout << "Computing std image" << std::endl;
   // Check mean image
   if (mean_image_.empty() || mean_image_.size() != images_.front().size()) {
@@ -142,8 +142,8 @@ std::pair<float, float> CIFAR10Reader::minmax() {
   return {gmin, gmax};
 }
 
-std::vector<size_t> CIFAR10Reader::get_batch_idxs(int batch_size) const {
-  return shuffler.get_random_indexies(batch_size);
+std::vector<size_t> CIFAR10Reader::getBatchIdxs(int batch_size) const {
+  return shuffler.getRandomIndexies(batch_size);
 }
 
 std::vector<float> CIFAR10Reader::undoPreprocessing(

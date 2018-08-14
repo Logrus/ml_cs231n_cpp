@@ -21,31 +21,31 @@ SimpleNetUI::SimpleNetUI(QWidget* parent)
   label_names.push_back("ship");
   label_names.push_back("truck");
 
-  QDir dir("../CIFAR10/");
+  //  QDir dir("../CIFAR10/");
 
-  if (!dir.exists()) {
-    return;
-  }
+  //  if (!dir.exists()) {
+  //    return;
+  //  }
 
-  dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-  QStringList filters;
-  filters << "data_batch_1.bin";
-  filters << "data_batch_2.bin";
-  filters << "data_batch_3.bin";
-  filters << "data_batch_4.bin";
-  filters << "data_batch_5.bin";
-  dir.setNameFilters(filters);
+  //  dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+  //  QStringList filters;
+  //  filters << "data_batch_1.bin";
+  //  filters << "data_batch_2.bin";
+  //  filters << "data_batch_3.bin";
+  //  filters << "data_batch_4.bin";
+  //  filters << "data_batch_5.bin";
+  //  dir.setNameFilters(filters);
 
-  foreach (QFileInfo mitm, dir.entryInfoList()) {
-    trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
-  }
+  //  foreach (QFileInfo mitm, dir.entryInfoList()) {
+  //    trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
+  //  }
 
-  filters.clear();
-  filters << "test_batch.bin";
-  dir.setNameFilters(filters);
-  foreach (QFileInfo mitm, dir.entryInfoList()) {
-    testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
-  }
+  //  filters.clear();
+  //  filters << "test_batch.bin";
+  //  dir.setNameFilters(filters);
+  //  foreach (QFileInfo mitm, dir.entryInfoList()) {
+  //    testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
+  //  }
 
   // Ui init
   // Learning rate
@@ -205,14 +205,14 @@ void SimpleNetUI::on_actionOpen_dataset_triggered() {
   dir.setNameFilters(filters);
 
   foreach (QFileInfo mitm, dir.entryInfoList()) {
-    trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
+    trainset.readBin(mitm.absoluteFilePath().toUtf8().constData(), false);
   }
 
   filters.clear();
   filters << "test_batch.bin";
   dir.setNameFilters(filters);
   foreach (QFileInfo mitm, dir.entryInfoList()) {
-    testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), false);
+    testset.readBin(mitm.absoluteFilePath().toUtf8().constData(), false);
   }
 
   // updateImage();
@@ -301,7 +301,7 @@ void SimpleNetUI::on_pushButton_clicked() {
       // }
 
       float loss =
-          classifier->loss(trainset.images(), trainset.labels(), trainset.get_batch_idxs(bs));
+          classifier->loss(trainset.images(), trainset.labels(), trainset.getBatchIdxs(bs));
       std::cout << " Loss " << loss << std::endl;
 
       maxloss = maxloss > loss ? maxloss : loss;
@@ -404,19 +404,19 @@ void SimpleNetUI::on_regBox_valueChanged(double regularizer) {
 
 void SimpleNetUI::on_buttonMeanImage_clicked() {
   // Demean test set
-  trainset.compute_mean();
+  trainset.computeMean();
   trainset.demean();
   // Demean training set
-  testset.setMeanImage(trainset.mean_image());
+  testset.setMeanImage(trainset.meanImage());
   testset.demean();
 
   // Show mean image
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-      int red = trainset.mean_image()[y * 32 + x];
-      int green = trainset.mean_image()[1024 + y * 32 + x];
-      int blue = trainset.mean_image()[2048 + y * 32 + x];
+      int red = trainset.meanImage()[y * 32 + x];
+      int green = trainset.meanImage()[1024 + y * 32 + x];
+      int blue = trainset.meanImage()[2048 + y * 32 + x];
       img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
@@ -439,21 +439,21 @@ void SimpleNetUI::on_buttonNormalizationReset_clicked() {
 
 void SimpleNetUI::on_buttonStandardize_clicked() {
   // Standardize trainset
-  trainset.compute_mean();
-  trainset.compute_std();
+  trainset.computeMean();
+  trainset.computeStd();
   trainset.standardize();
   // Standardize testset
-  testset.setMeanImage(trainset.mean_image());
-  testset.setStdImage(trainset.std_image());
+  testset.setMeanImage(trainset.meanImage());
+  testset.setStdImage(trainset.stdImage());
   testset.standardize();
 
   // Show mean image
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-      int red = trainset.mean_image()[y * 32 + x];
-      int green = trainset.mean_image()[1024 + y * 32 + x];
-      int blue = trainset.mean_image()[2048 + y * 32 + x];
+      int red = trainset.meanImage()[y * 32 + x];
+      int green = trainset.meanImage()[1024 + y * 32 + x];
+      int blue = trainset.meanImage()[2048 + y * 32 + x];
       img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
@@ -465,9 +465,9 @@ void SimpleNetUI::on_buttonStandardize_clicked() {
   QImage img2(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-      int red = trainset.std_image()[y * 32 + x];
-      int green = trainset.std_image()[1024 + y * 32 + x];
-      int blue = trainset.std_image()[2048 + y * 32 + x];
+      int red = trainset.stdImage()[y * 32 + x];
+      int green = trainset.stdImage()[1024 + y * 32 + x];
+      int blue = trainset.stdImage()[2048 + y * 32 + x];
       img2.setPixel(x, y, qRgb(red, green, blue));
     }
   }

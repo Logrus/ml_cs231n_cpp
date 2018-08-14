@@ -1,33 +1,26 @@
 #include <classifiers/linearsvm.h>
-LinearSVM::LinearSVM(int classes, int dimentionality) : Classifier(classes, dimentionality) {}
 
-float LinearSVM::L2W_reg() {
+LinearSVM::LinearSVM(const unsigned classes, const unsigned dimentionality)
+    : Classifier(classes, dimentionality) {}
+
+float LinearSVM::weightRegularizationL2() const {
   float sum = 0;
-  for (int x = 0; x < W.xSize(); ++x)
-    for (int y = 0; y < W.ySize(); ++y) {
-      sum += W(x, y) * W(x, y);
+  for (int x = 0; x < W_.xSize(); ++x)
+    for (int y = 0; y < W_.ySize(); ++y) {
+      sum += W_(x, y) * W_(x, y);
     }
   return sum;
 }
 
-float LinearSVM::loss_one_image(const std::vector<float>& image, const int& y) {
-  assert(image.size() == 3073);
-
-  std::vector<float> scores(10, 0);
-
+float LinearSVM::lossForSingleImage(const std::vector<float>& image, const int& y) {
   // Compute scores
   // scores = W*x
-  for (int c = 0; c < C; ++c) {
-    for (int d = 0; d < D; ++d) {
-      scores[c] += W(c, d) * image[d];
-    }
-  }
+  std::vector<float> scores = computeScores(image);
 
   // Compute loss
   float loss = 0;
-  int counter = 0;
-  std::vector<float> margins(10, 0);
-  for (int j = 0; j < C; ++j) {
+  std::vector<float> margins(classes_dim_, 0);
+  for (size_t j = 0; j < classes_dim_; ++j) {
     if (j == y) continue;
     float margin = scores[j] - scores[y] + 1;
 
@@ -35,9 +28,9 @@ float LinearSVM::loss_one_image(const std::vector<float>& image, const int& y) {
 
     // Compute gradient
     if (margin > 0) {
-      for (int d = 0; d < D; ++d) {
-        dW(y, d) -= image[d];
-        dW(j, d) += image[d];
+      for (size_t d = 0; d < data_dim_; ++d) {
+        dW_(y, d) -= image[d];
+        dW_(j, d) += image[d];
       }
     }
   }
@@ -45,70 +38,52 @@ float LinearSVM::loss_one_image(const std::vector<float>& image, const int& y) {
   return loss;
 }
 
-float LinearSVM::loss(const std::vector<std::vector<float> >& images,
-                      const std::vector<int>& labels, const std::vector<size_t>& indexies) {
-  assert(images.size() == 50000);
-  assert(C == 10);
-  assert(D == 3073);
-
-  // std::cout << "From " << from << " to " << to << " size " << to-from << std::endl;
-
+float LinearSVM::computeLoss(const std::vector<std::vector<float> >& images,
+                             const std::vector<int>& labels, const std::vector<size_t>& indexies) {
   // Reset gradient
-  dW.fill(0.0);
+  dW_.fill(0.0);
 
   // Compute loss for all images
   float L = 0;
-  int N = indexies.size();  // N images in batch
-  for (int i = 0; i < N; ++i) {
-    L += loss_one_image(images[indexies[i]], labels[indexies[i]]);
+  const size_t N = indexies.size();  // N images in batch
+  for (size_t i = 0; i < N; ++i) {
+    L += lossForSingleImage(images[indexies[i]], labels[indexies[i]]);
   }
-  L /= N;
-  L += 0.5 * lambda * L2W_reg();
+  L /= static_cast<float>(N);
+  L += 0.5 * lambda_ * weightRegularizationL2();
 
   // Normalize and regularize gradient
-  for (int x = 0; x < dW.xSize(); ++x) {
-    for (int y = 0; y < dW.ySize(); ++y) {
-      dW(x, y) = dW(x, y) / static_cast<float>(N) + lambda * W(x, y);
+  for (int x = 0; x < dW_.xSize(); ++x) {
+    for (int y = 0; y < dW_.ySize(); ++y) {
+      dW_(x, y) = dW_(x, y) / static_cast<float>(N) + lambda_ * W_(x, y);
     }
   }
 
   // Update weights
-  for (int x = 0; x < W.xSize(); ++x) {
-    for (int y = 0; y < W.ySize(); ++y) {
-      W(x, y) -= learning_rate * dW(x, y);
+  for (int x = 0; x < W_.xSize(); ++x) {
+    for (int y = 0; y < W_.ySize(); ++y) {
+      W_(x, y) -= learning_rate_ * dW_(x, y);
     }
   }
 
   return L;
 }
 
-int LinearSVM::inference(const std::vector<float>& image) {
-  std::vector<float> scores(10, 0);
-
+int LinearSVM::infer(const std::vector<float>& image) const {
   // scores = W*x
-  for (int c = 0; c < C; ++c) {
-    for (int d = 0; d < D; ++d) {
-      scores[c] += W(c, d) * image[d];
-    }
-  }
-
+  std::vector<float> scores = computeScores(image);
+  // Get the index of the max element
   return std::max_element(scores.begin(), scores.end()) - scores.begin();
 }
 
-std::vector<float> LinearSVM::inference_loss(const std::vector<float>& image, const int& y) {
-  std::vector<float> scores(10, 0);
-
+std::vector<float> LinearSVM::inferenceLoss(const std::vector<float>& image, const size_t y) const {
   // Compute scores
   // scores = W*x
-  for (int c = 0; c < C; ++c) {
-    for (int d = 0; d < D; ++d) {
-      scores[c] += W(c, d) * image[d];
-    }
-  }
+  std::vector<float> scores = computeScores(image);
 
   // Compute loss
-  std::vector<float> margins(10, 0);
-  for (int j = 0; j < C; ++j) {
+  std::vector<float> margins(classes_dim_, 0);
+  for (size_t j = 0; j < classes_dim_; ++j) {
     if (j == y) continue;
     margins[j] = std::max(0.f, scores[j] - scores[y] + 1);
   }

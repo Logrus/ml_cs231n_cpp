@@ -10,17 +10,17 @@ int main() {
                                     "../CIFAR10/data_batch_3.bin", "../CIFAR10/data_batch_4.bin",
                                     "../CIFAR10/data_batch_5.bin"};
   for (int i = 0; i < names.size(); ++i) {
-    trainset.read_bin(names[i], false);
+    trainset.readBin(names[i], false);
   }
 
   // Demean test set
-  trainset.compute_mean();
+  trainset.computeMean();
 
   CIFAR10Reader testset;
-  testset.read_bin("../CIFAR10/test_batch.bin", false);
+  testset.readBin("../CIFAR10/test_batch.bin", false);
 
   // Demean training set
-  testset.setMeanImage(trainset.mean_image());
+  testset.setMeanImage(trainset.meanImage());
   testset.demean();
 
   SimpleNeuralNet net1(3072, 70, 10, 0.0001);

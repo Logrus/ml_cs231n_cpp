@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Learning rate
   ui->learningRateBox->setRange(0, 22);
   ui->learningRateBox->setSingleStep(1);
-  ui->learningRateBox->setValue(static_cast<int>(abs(log10(classifier->learning_rate))));
+  ui->learningRateBox->setValue(static_cast<int>(abs(log10(classifier->learning_rate_))));
 
   // Epochs
   ui->iterBox->setRange(1, 999);
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget* parent)
   // Regularization
   ui->regBox->setDecimals(22);
   ui->regBox->setSingleStep(0.00001);
-  ui->regBox->setValue(static_cast<double>(classifier->lambda));
+  ui->regBox->setValue(static_cast<double>(classifier->lambda_));
 
   // Gather ui elements into a vec
   ui_labels_score_.push_back(ui->labelPlaneScore);
@@ -77,8 +77,8 @@ void MainWindow::updateImage() {
   ui->piclabel_zoomed->setPixmap(QPixmap::fromImage(img));
   ui->labelLineEdit->setText(QString::fromStdString(kCIFAR10Labels[trainset.labels()[index]]));
 
-  std::vector<float> scores = classifier->scores(trainset.images()[index]);
-  int predicted_label = classifier->inference(trainset.images()[index]);
+  std::vector<float> scores = classifier->computeScores(trainset.images()[index]);
+  int predicted_label = classifier->infer(trainset.images()[index]);
   ui->predictionLineEdit->setText(QString::fromStdString(kCIFAR10Labels[predicted_label]));
 
   for (size_t i = 0; i < ui_labels_score_.size(); ++i) {
@@ -87,7 +87,7 @@ void MainWindow::updateImage() {
 
   // Evaluate loss vector
   std::vector<float> loss_vec =
-      classifier->inference_loss(trainset.images()[index], trainset.labels()[index]);
+      classifier->inferenceLoss(trainset.images()[index], trainset.labels()[index]);
   for (size_t i = 0; i < ui_labels_loss_.size(); ++i) {
     ui_labels_loss_[i]->setText(QString::number(static_cast<double>(loss_vec[i]), 10, 5));
   }
@@ -113,14 +113,14 @@ void MainWindow::on_actionOpen_dataset_triggered() {
   dir.setNameFilters(filters);
 
   foreach (QFileInfo mitm, dir.entryInfoList()) {
-    trainset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
+    trainset.readBin(mitm.absoluteFilePath().toUtf8().constData(), true);
   }
 
   filters.clear();
   filters << "test_batch.bin";
   dir.setNameFilters(filters);
   foreach (QFileInfo mitm, dir.entryInfoList()) {
-    testset.read_bin(mitm.absoluteFilePath().toUtf8().constData(), true);
+    testset.readBin(mitm.absoluteFilePath().toUtf8().constData(), true);
   }
 
   updateImage();
@@ -149,7 +149,7 @@ void MainWindow::visualizeWeights() {
   QImage img8(32, 32, QImage::Format_RGB888);
   QImage img9(32, 32, QImage::Format_RGB888);
 
-  CMatrix<float> normW = classifier->W;
+  CMatrix<float> normW = classifier->W_;
   normW.normalize(0, 255);
 
   weight2image(normW, 0, img0);
@@ -201,7 +201,7 @@ float MainWindow::evaluateAcc() {
   int correct = 0;
   int total = 0;
   for (size_t i = 0; i < testset.images().size(); ++i) {
-    int label = classifier->inference(testset.images()[i]);
+    int label = classifier->infer(testset.images()[i]);
     if (label == testset.labels()[i]) correct++;
     total++;
   }
@@ -220,27 +220,27 @@ void MainWindow::on_pushButton_clicked() {
   for (int epoch = 0; epoch < ui->iterBox->value(); epoch++) {
     for (int i = 0; i < iters; ++i) {
       float loss =
-          classifier->loss(trainset.images(), trainset.labels(), trainset.get_batch_idxs(bs));
+          classifier->computeLoss(trainset.images(), trainset.labels(), trainset.getBatchIdxs(bs));
 
       ui->lossLabel->setText("Loss: " + QString::number(loss));
       visualizeWeights();
       updateImage();
       qApp->processEvents();
       if (stopped_) return;
-      float Wmax = classifier->W.max();
-      float Wmin = classifier->W.min();
+      float Wmax = classifier->W_.max();
+      float Wmin = classifier->W_.min();
       ui->labelWMax->setText("WMax: " + QString::number(Wmax));
       ui->labelWMin->setText("WMin: " + QString::number(Wmin));
 
-      float dWmax = classifier->dW.max();
-      float dWmin = classifier->dW.min();
+      float dWmax = classifier->dW_.max();
+      float dWmin = classifier->dW_.min();
       ui->labeldWMax->setText("dWMax: " + QString::number(dWmax));
       ui->labeldWMin->setText("dWMin: " + QString::number(dWmin));
 
-      ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax * classifier->learning_rate));
-      ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin * classifier->learning_rate));
+      ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax * classifier->learning_rate_));
+      ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin * classifier->learning_rate_));
 
-      ui->labelRatio->setText("Ratio: " + QString::number(classifier->weight_ratio()));
+      ui->labelRatio->setText("Ratio: " + QString::number(classifier->computeWeightRatio()));
     }
 
     float acc = evaluateAcc();
@@ -259,45 +259,45 @@ void MainWindow::on_resetButton_clicked() {
 }
 
 void MainWindow::on_learningRateBox_valueChanged(int lr_exp) {
-  classifier->learning_rate = std::pow(10.f, -ui->learningRateBox->value());
+  classifier->learning_rate_ = std::pow(10.f, -ui->learningRateBox->value());
   std::cout << "New learning rate value " << std::pow(10.f, -ui->learningRateBox->value())
             << std::endl;
 }
 
 void MainWindow::on_SVMRadioButton_clicked() {
-  gW = classifier->W;
+  gW = classifier->W_;
   classifier.reset(new LinearSVM(10, 3073));
   classifier->copyW(gW);
   visualizeWeights();
 }
 
 void MainWindow::on_SoftmaxRadioButton_clicked() {
-  gW = classifier->W;
+  gW = classifier->W_;
   classifier.reset(new LinearSoftmax(10, 3073));
   classifier->copyW(gW);
   visualizeWeights();
 }
 
 void MainWindow::on_regBox_valueChanged(double regularizer) {
-  classifier->lambda = regularizer;
+  classifier->lambda_ = regularizer;
   std::cout << "New regularization value " << regularizer << std::endl;
 }
 
 void MainWindow::on_buttonMeanImage_clicked() {
   // Demean test set
-  trainset.compute_mean();
+  trainset.computeMean();
   trainset.demean();
   // Demean training set
-  testset.setMeanImage(trainset.mean_image());
+  testset.setMeanImage(trainset.meanImage());
   testset.demean();
 
   // Show mean image
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-      int red = trainset.mean_image()[y * 32 + x];
-      int green = trainset.mean_image()[1024 + y * 32 + x];
-      int blue = trainset.mean_image()[2048 + y * 32 + x];
+      int red = trainset.meanImage()[y * 32 + x];
+      int green = trainset.meanImage()[1024 + y * 32 + x];
+      int blue = trainset.meanImage()[2048 + y * 32 + x];
       img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
@@ -320,21 +320,21 @@ void MainWindow::on_buttonNormalizationReset_clicked() {
 
 void MainWindow::on_buttonStandardize_clicked() {
   // Standardize trainset
-  trainset.compute_mean();
-  trainset.compute_std();
+  trainset.computeMean();
+  trainset.computeStd();
   trainset.standardize();
   // Standardize testset
-  testset.setMeanImage(trainset.mean_image());
-  testset.setStdImage(trainset.std_image());
+  testset.setMeanImage(trainset.meanImage());
+  testset.setStdImage(trainset.stdImage());
   testset.standardize();
 
   // Show mean image
   QImage img(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-      int red = trainset.mean_image()[y * 32 + x];
-      int green = trainset.mean_image()[1024 + y * 32 + x];
-      int blue = trainset.mean_image()[2048 + y * 32 + x];
+      int red = trainset.meanImage()[y * 32 + x];
+      int green = trainset.meanImage()[1024 + y * 32 + x];
+      int blue = trainset.meanImage()[2048 + y * 32 + x];
       img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
@@ -346,9 +346,9 @@ void MainWindow::on_buttonStandardize_clicked() {
   QImage img2(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-      int red = trainset.std_image()[y * 32 + x];
-      int green = trainset.std_image()[1024 + y * 32 + x];
-      int blue = trainset.std_image()[2048 + y * 32 + x];
+      int red = trainset.stdImage()[y * 32 + x];
+      int green = trainset.stdImage()[1024 + y * 32 + x];
+      int blue = trainset.stdImage()[2048 + y * 32 + x];
       img2.setPixel(x, y, qRgb(red, green, blue));
     }
   }
