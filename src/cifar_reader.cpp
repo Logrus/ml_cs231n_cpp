@@ -25,8 +25,8 @@ bool CIFAR10Reader::readBin(const std::string filepath, const bool bias_trick = 
     // push to the vector of labels
     labels_.emplace_back(tplabel);
 
-    std::array<char, kNumOfChannels * KNRows * KNCols> buffer;
-    file.read(buffer.data(), buffer.size());
+    std::array<unsigned char, kNumOfChannels * KNRows * KNCols> buffer;
+    file.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
     if (!file.good()) {
       std::cerr << "Error while reading CIFAR10 dataset!" << std::endl;
       return false;
