@@ -5,7 +5,7 @@ They were developed for visualization and understanding while doing CS231n from 
 
 This project contains:
 
-1. Implementation of the SVM and Softmax loss [video](https://www.youtube.com/watch?v=QrRTKM8xJaA)
+1. Implementation of the SVM and Softmax loss [video](https://youtu.be/uN4bURYopN4)
 2. Implementation of the 2 layer neural network [video](https://www.youtube.com/watch?v=CHpu8N18aRs)
 3. Multiple normalization possibilities (mean subtraction, normalization, standardization)
 4. Adam weight update
