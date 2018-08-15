@@ -4,7 +4,18 @@
 namespace {
 const std::vector<std::string> kCIFAR10Labels = {"plane", "car",  "bird",  "cat",  "deer",
                                                  "dog",   "frog", "horse", "ship", "truck"};
+
+void weight2image(CMatrix<float> w, int label, QImage& img) {
+  for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+      int red = w(label, y * 32 + x);
+      int green = w(label, 1024 + y * 32 + x);
+      int blue = w(label, 2048 + y * 32 + x);
+      img.setPixel(x, y, qRgb(red, green, blue));
+    }
+  }
 }
+}  // namespace
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent), ui(new Ui::MainWindow), classifier(new LinearSVM(10, 3073)) {
@@ -53,6 +64,8 @@ MainWindow::MainWindow(QWidget* parent)
   ui_labels_loss_.push_back(ui->labelHorseLoss);
   ui_labels_loss_.push_back(ui->labelShipLoss);
   ui_labels_loss_.push_back(ui->labelTruckLoss);
+
+  resetUI();
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -126,18 +139,8 @@ void MainWindow::on_actionOpen_dataset_triggered() {
   updateImage();
 }
 
-void weight2image(CMatrix<float> w, int label, QImage& img) {
-  for (int x = 0; x < 32; ++x) {
-    for (int y = 0; y < 32; ++y) {
-      int red = w(label, y * 32 + x);
-      int green = w(label, 1024 + y * 32 + x);
-      int blue = w(label, 2048 + y * 32 + x);
-      img.setPixel(x, y, qRgb(red, green, blue));
-    }
-  }
-}
-
 void MainWindow::visualizeWeights() {
+  /// \todo wtf, refactor
   QImage img0(32, 32, QImage::Format_RGB888);
   QImage img1(32, 32, QImage::Format_RGB888);
   QImage img2(32, 32, QImage::Format_RGB888);
@@ -285,11 +288,16 @@ void MainWindow::on_regBox_valueChanged(double regularizer) {
 
 void MainWindow::on_buttonMeanImage_clicked() {
   // Demean test set
-  trainset.computeMean();
-  trainset.demean();
+  if (!trainset.demean()) {
+    std::cerr << "Unable to demean training set" << std::endl;
+    return;
+  }
   // Demean training set
   testset.setMeanImage(trainset.meanImage());
-  testset.demean();
+  if (!testset.demean()) {
+    std::cerr << "Unable to demean test set" << std::endl;
+    return;
+  }
 
   // Show mean image
   QImage img(32, 32, QImage::Format_RGB888);
@@ -308,6 +316,7 @@ void MainWindow::on_buttonMeanImage_clicked() {
   auto minmax = trainset.minmax();
   ui->dataMin->setText("Min: " + QString::number(minmax.first));
   ui->dataMax->setText("Max: " + QString::number(minmax.second));
+  ui->labelNormalizationStatus->setText("Images are: demeaned");
 }
 
 void MainWindow::on_buttonNormalizationReset_clicked() {
@@ -316,17 +325,27 @@ void MainWindow::on_buttonNormalizationReset_clicked() {
   auto minmax = trainset.minmax();
   ui->dataMin->setText("Min: " + QString::number(minmax.first));
   ui->dataMax->setText("Max: " + QString::number(minmax.second));
+
+  /// \todo also reset picture in gui
+  ui->labelMeanImage->clear();
+  ui->stdImage->clear();
+  ui->labelNormalizationStatus->setText("Images are: pristine");
 }
 
 void MainWindow::on_buttonStandardize_clicked() {
   // Standardize trainset
-  trainset.computeMean();
-  trainset.computeStd();
-  trainset.standardize();
+  if (!trainset.standardize()) {
+    std::cerr << "Unable to standardize training set" << std::endl;
+    return;
+  }
+
   // Standardize testset
   testset.setMeanImage(trainset.meanImage());
   testset.setStdImage(trainset.stdImage());
-  testset.standardize();
+  if (!testset.standardize()) {
+    std::cerr << "Unable to standardize test set" << std::endl;
+    return;
+  }
 
   // Show mean image
   QImage img(32, 32, QImage::Format_RGB888);
@@ -359,12 +378,29 @@ void MainWindow::on_buttonStandardize_clicked() {
   auto minmax = trainset.minmax();
   ui->dataMin->setText("Min: " + QString::number(minmax.first));
   ui->dataMax->setText("Max: " + QString::number(minmax.second));
+  ui->labelNormalizationStatus->setText("Images are: standardized");
 }
 
 void MainWindow::on_buttonNormalize_clicked() {
-  trainset.normalize();
-  testset.normalize();
-  auto minmax = trainset.minmax();
+  std::cerr << "WARNING: normalization isn't implemented correctly now!" << std::endl;
+  if (!trainset.normalize()) {
+    std::cerr << "Unable to normalize training set" << std::endl;
+    return;
+  }
+  /// \todo should the normalization be the same??
+  if (!testset.normalize()) {
+    std::cerr << "Unable to normalize test set" << std::endl;
+    return;
+  }
+  const auto minmax = trainset.minmax();
   ui->dataMin->setText("Min: " + QString::number(minmax.first));
   ui->dataMax->setText("Max: " + QString::number(minmax.second));
+  ui->labelNormalizationStatus->setText("Images are: normalized");
+}
+
+void MainWindow::resetUI() {
+  ui->labelMeanImage->clear();
+  ui->stdImage->clear();
+  visualizeWeights();
+  ///\todo all images...
 }

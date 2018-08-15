@@ -55,6 +55,7 @@ class MainWindow : public QMainWindow {
   void on_buttonNormalize_clicked();
 
  private:
+  void resetUI();
   void visualizeWeights();
   float evaluateAcc();
 

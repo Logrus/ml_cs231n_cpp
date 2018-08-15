@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -23,6 +23,7 @@ class Image {
  public:
   enum class Channel : unsigned { RED = 0, GREEN, BLUE };
 
+  Image() = default;
   Image(const size_t width, const size_t height, const size_t channels)
       : width_(width), height_(height), channels_(channels) {}
   Image(const std::vector<float>& float_image, const size_t width, const size_t height,
@@ -56,19 +57,21 @@ class CIFAR10Reader {
   bool readBin(std::string filepath, const bool bias_trick);
 
   // Data processing
-  void computeMean();
-  void computeStd();
-  void normalize();
-  void standardize();
-  void demean();
-  void reset();
+  void computeMeanImage();
+  void computeStdImage();
+  bool normalize();
+  bool standardize();
+  bool demean();
+  bool reset();
 
   void setMeanImage(const std::vector<float>& mean_image) { mean_image_ = mean_image; }
   void setStdImage(const std::vector<float>& std_image) { std_image_ = std_image; }
-  Image getImage(size_t index) const {
-    const std::vector<float> no_preprocessing = undoPreprocessing(images_[index]);
-    return Image(no_preprocessing, 32, 32, 3);
-  }
+  Image getImage(const size_t index) const;
+
+  bool meanImageIsComputed() const;
+  bool stdImageIsComputed() const;
+  bool datasetWasPreprocessed() const;
+  bool datasetIsLoaded() const;
 
   std::pair<float, float> minmax();
 
@@ -80,12 +83,11 @@ class CIFAR10Reader {
   const std::vector<std::vector<float>>& images() const { return images_; }
 
  private:
-  std::vector<float> undoPreprocessing(const std::vector<float>& preprocessed_image) const;
   std::vector<int> labels_;
   std::vector<std::vector<float>> images_;
   std::vector<float> mean_image_;
   std::vector<float> std_image_;
   PreprocessingType state_;
   mutable FisherYatesShuffle shuffler;
-  std::vector<std::vector<float>> images_copy_;
+  std::vector<std::vector<float>> const_images_;
 };

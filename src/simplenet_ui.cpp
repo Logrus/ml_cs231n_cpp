@@ -404,7 +404,7 @@ void SimpleNetUI::on_regBox_valueChanged(double regularizer) {
 
 void SimpleNetUI::on_buttonMeanImage_clicked() {
   // Demean test set
-  trainset.computeMean();
+  trainset.computeMeanImage();
   trainset.demean();
   // Demean training set
   testset.setMeanImage(trainset.meanImage());
@@ -439,8 +439,8 @@ void SimpleNetUI::on_buttonNormalizationReset_clicked() {
 
 void SimpleNetUI::on_buttonStandardize_clicked() {
   // Standardize trainset
-  trainset.computeMean();
-  trainset.computeStd();
+  trainset.computeMeanImage();
+  trainset.computeStdImage();
   trainset.standardize();
   // Standardize testset
   testset.setMeanImage(trainset.meanImage());

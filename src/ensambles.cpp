@@ -14,7 +14,7 @@ int main() {
   }
 
   // Demean test set
-  trainset.computeMean();
+  trainset.computeMeanImage();
 
   CIFAR10Reader testset;
   testset.readBin("../CIFAR10/test_batch.bin", false);

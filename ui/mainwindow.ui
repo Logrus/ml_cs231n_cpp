@@ -21,6 +21,42 @@
        <string>Data preprocessing</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="1" rowspan="2">
+        <layout class="QVBoxLayout" name="verticalLayout_18">
+         <item>
+          <widget class="QLabel" name="labelMeanImage">
+           <property name="text">
+            <string>MeanImage</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="stdImage">
+           <property name="text">
+            <string>stdImage</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <layout class="QVBoxLayout" name="verticalLayout_17">
+         <item>
+          <widget class="QLabel" name="dataMax">
+           <property name="text">
+            <string>Max:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="dataMin">
+           <property name="text">
+            <string>Min:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item row="0" column="0">
         <layout class="QVBoxLayout" name="verticalLayout_16">
          <item>
@@ -53,37 +89,12 @@
          </item>
         </layout>
        </item>
-       <item row="0" column="1" rowspan="2">
-        <layout class="QVBoxLayout" name="verticalLayout_18">
+       <item row="2" column="0" colspan="2">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QLabel" name="labelMeanImage">
+          <widget class="QLabel" name="labelNormalizationStatus">
            <property name="text">
-            <string>MeanImage</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="stdImage">
-           <property name="text">
-            <string>stdImage</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_17">
-         <item>
-          <widget class="QLabel" name="dataMax">
-           <property name="text">
-            <string>Max:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="dataMin">
-           <property name="text">
-            <string>Min:</string>
+            <string>Images are: </string>
            </property>
           </widget>
          </item>
