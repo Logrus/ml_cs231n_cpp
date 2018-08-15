@@ -66,7 +66,7 @@ SimpleNetUI::SimpleNetUI(QWidget* parent)
   ui->regBox->setSingleStep(0.00001);
   ui->regBox->setValue(classifier->lambda);
 
-  updateImage();
+  // updateImage();
 
   TableWidget = new QTableWidget(this);
   TableWidget->setRowCount(10);
