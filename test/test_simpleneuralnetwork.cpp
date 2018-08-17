@@ -1,14 +1,13 @@
-#undef NDEBUG  // Do assert always
-#include <assert.h>
 #include <classifiers/simpleneuralnet.h>
+
+#include <gtest/gtest.h>
+
 #include <iomanip>
 #include <iostream>
 #include <vector>
 
-int main() {
-  // ==== Parameters for tests ======
-
-  const float epsilon = 1.e-6;
+TEST(TestSimpleNeuralNet, Forward) {
+  static constexpr double epsilon = 1.e-6;
 
   const std::vector<std::vector<float> > W1 = {
       {0.17640523, 0.04001572, 0.0978738, 0.22408932, 0.1867558, -0.09772779, 0.09500884,
@@ -75,90 +74,69 @@ int main() {
   // ============ Test ===============
   SimpleNeuralNet net(4, 10, 3, 0.001);
 
-  assert(net.W1.ySize() == W1.size());
-  assert(net.W1.xSize() == W1[0].size());
-  assert(net.W2.ySize() == W2.size());
-  assert(net.W2.xSize() == W2[0].size());
+  ASSERT_EQ(net.W1.ySize(), W1.size());
+  ASSERT_EQ(net.W1.xSize(), W1[0].size());
+  ASSERT_EQ(net.W2.ySize(), W2.size());
+  ASSERT_EQ(net.W2.xSize(), W2[0].size());
 
   // Set biases
   std::fill(net.b1.begin(), net.b1.end(), 0.f);
   std::fill(net.b2.begin(), net.b2.end(), 0.f);
 
   // Set weights
-  std::cout << "W1: " << std::endl;
   for (int y = 0; y < net.W1.ySize(); ++y) {
     for (int x = 0; x < net.W1.xSize(); ++x) {
       net.W1(x, y) = W1[y][x];
-      std::cout << std::setw(10) << net.W1(x, y) << " ";
     }
-    std::cout << std::endl;
   }
 
-  std::cout << "W2: " << std::endl;
   for (int y = 0; y < net.W2.ySize(); ++y) {
     for (int x = 0; x < net.W2.xSize(); ++x) {
       net.W2(x, y) = W2[y][x];
-      std::cout << std::setw(10) << net.W2(x, y) << " ";
     }
-    std::cout << std::endl;
   }
 
   // Test scores in inference
-  std::cout << "Testing scores in inference..." << std::flush;
+  //  std::cout << "Testing scores in inference..." << std::flush;
   for (int i = 0; i < inputs.size(); ++i) {
     std::vector<float> scores = net.inference_scores(inputs[i]);
     for (int j = 0; j < scores.size(); ++j) {
-      assert((scores[j] - expected_scores[i][j]) < epsilon);
+      EXPECT_NEAR(scores[j], expected_scores[i][j], epsilon);
     }
   }
-  std::cout << "passed." << std::endl;
+  //  std::cout << "passed." << std::endl;
 
   // Test scores in loss
-  std::cout << "Testing scores in loss..." << std::flush;
   for (int i = 0; i < inputs.size(); ++i) {
     net.loss_one_image(inputs[i], labels[i]);
     for (int j = 0; j < net.S.size(); ++j) {
-      assert((net.S[j] - expected_scores[i][j]) < epsilon);
+      EXPECT_NEAR(net.S[j], expected_scores[i][j], epsilon);
     }
   }
-  std::cout << "passed." << std::endl;
 
   // Test loss
-  std::cout << "Testing loss..." << std::flush;
   net.lambda = 0.1f;
   float loss = net.loss(inputs, labels, batch_idx);
-  assert((correct_loss - loss) < epsilon);
-  std::cout << "passed." << std::endl;
+  EXPECT_NEAR(correct_loss, loss, epsilon);
 
   // Check gradients
-  std::cout << "Testing db2..." << std::flush;
   for (int i = 0; i < db2.size(); ++i) {
-    assert((net.db2[i] - db2[i]) < epsilon);
+    EXPECT_NEAR(net.db2[i], db2[i], epsilon);
   }
-  std::cout << "passed." << std::endl;
 
-  std::cout << "Testing db1..." << std::flush;
   for (int i = 0; i < db1.size(); ++i) {
-    assert((net.db1[i] - db1[i]) < epsilon);
+    EXPECT_NEAR(net.db1[i], db1[i], epsilon);
   }
-  std::cout << "passed." << std::endl;
 
-  std::cout << "Testing dW1..." << std::flush;
   for (int y = 0; y < net.dW1.ySize(); ++y) {
     for (int x = 0; x < net.dW1.xSize(); ++x) {
-      assert((net.dW1(x, y) - dW1[y][x]) < epsilon);
+      EXPECT_NEAR(net.dW1(x, y), dW1[y][x], epsilon);
     }
   }
-  std::cout << "passed." << std::endl;
 
-  std::cout << "Testing dW2..." << std::flush;
   for (int y = 0; y < net.dW2.ySize(); ++y) {
     for (int x = 0; x < net.dW2.xSize(); ++x) {
-      assert((net.dW2(x, y) - dW2[y][x]) < epsilon);
+      EXPECT_NEAR(net.dW2(x, y), dW2[y][x], epsilon);
     }
   }
-  std::cout << "passed." << std::endl;
-
-  std::cout << "All tests passed! " << std::endl;
-  return 0;
 }

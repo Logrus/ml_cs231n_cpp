@@ -1,5 +1,4 @@
-#ifndef FISHERYATESSHUFFLE_H
-#define FISHERYATESSHUFFLE_H
+#pragma once
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -28,6 +27,5 @@ class FisherYatesShuffle {
   std::vector<size_t> indexies_;
   size_t max_, n_elements_;
   std::random_device r_;
+  std::mt19937 gen_;
 };
-
-#endif  // FISHERYATESSHUFFLE_H

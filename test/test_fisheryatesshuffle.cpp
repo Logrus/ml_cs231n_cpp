@@ -1,24 +1,20 @@
-#include <iostream>
-#include <unordered_set>
-#include <vector>
-#undef NDEBUG  // Do assert always
-#include <assert.h>
 #include <classifiers/fisheryatesshuffle.h>
+#include <gtest/gtest.h>
 
-int main() {
+#include <iostream>
+#include <set>
+#include <vector>
+
+TEST(FisherYatesShuffle, GettingRandom500Indexies) {
   FisherYatesShuffle shuffler(50000);
 
-  std::vector<size_t> res;
-  std::unordered_set<size_t> test_set;
-
+  std::set<size_t> test_set;
   for (int i = 0; i < 5; i++) {
-    res = shuffler.getRandomIndexies(500);
-
-    for (auto a : res) {
-      assert(test_set.find(a) == test_set.end());
+    const std::vector<size_t> res = shuffler.getRandomIndexies(500);
+    EXPECT_EQ(res.size(), 500);
+    for (const size_t a : res) {
+      EXPECT_EQ(test_set.find(a), test_set.end());
       test_set.insert(a);
     }
   }
-  std::cout << "Test passed! " << std::endl;
-  return 0;
 }

@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 2.6 FATAL_ERROR)
-
+cmake_minimum_required(VERSION 2.8.2 FATAL_ERROR)
 project(visualizer)
 
 # In case of Makefiles if the user does not setup CMAKE_BUILD_TYPE, assume it's Release:
@@ -9,9 +8,7 @@ if (${CMAKE_GENERATOR} MATCHES ".*Makefiles")
     endif()
 endif()
 
-set  (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-
-
+set  (CMAKE_CXX_STANDARD 14)
 
 set  (project_SOURCES src/main.cpp
                       src/mainwindow.cpp
@@ -32,6 +29,40 @@ set  (project_HEADERS include/classifiers/mainwindow.h
                       include/classifiers/fisheryatesshuffle.h)
 set  (project_FORMS   ui/mainwindow.ui)
 
+find_package(Eigen3 REQUIRED)
+## Include gtest
+# Download and unpack googletest at configure time
+configure_file(cmake/CMakeLists.txt.in googletest-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "Build step for googletest failed: ${result}")
+endif()
+
+# Prevent overriding the parent project's compiler/linker
+# settings on Windows
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+# Add googletest directly to our build. This defines
+# the gtest and gtest_main targets.
+add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
+                 ${CMAKE_BINARY_DIR}/googletest-build
+                 EXCLUDE_FROM_ALL)
+
+# The gtest/gtest_main targets carry header search path
+# dependencies automatically when using CMake 2.8.11 or
+# later. Otherwise we have to add them here ourselves.
+if (CMAKE_VERSION VERSION_LESS 2.8.11)
+  include_directories("${gtest_SOURCE_DIR}/include")
+endif()
+## -- include gtest
 
 find_package (Qt4 MODULE)
 if(Qt4_FOUND)
@@ -88,8 +119,11 @@ add_executable(simple_net ${net_SOURCES} ${net_HEADERS_MOC} ${net_FORMS_HEADERS}
 target_link_libraries (simple_net ${QT_LIBRARIES})
 add_dependencies(simple_net copy_custom_plot)
 
-
 add_executable(test_fisheryatesshuffle test/test_fisheryatesshuffle.cpp src/fisheryatesshuffle.cpp)
+target_link_libraries(test_fisheryatesshuffle gtest_main)
+add_test(NAME test_fisheryatesshuffle COMMAND test_simpleneuralnetwork)
 add_executable(test_simpleneuralnetwork test/test_simpleneuralnetwork.cpp src/simpleneuralnet.cpp)
+target_link_libraries(test_simpleneuralnetwork gtest_main)
+add_test(NAME test_simpleneuralnetwork COMMAND test_simpleneuralnetwork)
 
 add_executable(ensambles src/ensambles.cpp src/simpleneuralnet.cpp src/cifar_reader.cpp src/fisheryatesshuffle.cpp)
