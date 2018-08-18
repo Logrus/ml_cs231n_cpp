@@ -43,6 +43,7 @@ MainWindow::MainWindow(QWidget* parent)
   ui->regBox->setValue(static_cast<double>(classifier->lambda_));
 
   // Gather ui elements into a vec
+  // \todo a better way of gathering all elements together?
   ui_labels_score_.push_back(ui->labelPlaneScore);
   ui_labels_score_.push_back(ui->labelCarScore);
   ui_labels_score_.push_back(ui->labelBirdScore);
@@ -65,7 +66,6 @@ MainWindow::MainWindow(QWidget* parent)
   ui_labels_loss_.push_back(ui->labelShipLoss);
   ui_labels_loss_.push_back(ui->labelTruckLoss);
 
-  // \todo
   ui_weight_labels_.push_back(ui->w1label);
   ui_weight_labels_.push_back(ui->w2label);
   ui_weight_labels_.push_back(ui->w3label);
