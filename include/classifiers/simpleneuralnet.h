@@ -22,7 +22,8 @@ class SimpleNeuralNet {
   int output_size_;
   float std_;
 
-  float loss(const std::vector<std::vector<float>>& images, const std::vector<int>& labels,
+  float loss(const std::vector<std::vector<float>>& images,
+             const std::vector<int>& labels,
              const std::vector<size_t>& batch_idx);
   float loss_one_image(const std::vector<float>& image, const int& y);
 

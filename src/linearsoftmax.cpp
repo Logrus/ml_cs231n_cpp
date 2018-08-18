@@ -1,6 +1,7 @@
 ﻿#include <classifiers/linearsoftmax.h>
 
-LinearSoftmax::LinearSoftmax(const unsigned classes, const unsigned dimentionality)
+LinearSoftmax::LinearSoftmax(const unsigned classes,
+                             const unsigned dimentionality)
     : Classifier(classes, dimentionality) {}
 
 float LinearSoftmax::weightRegularizationL2() const {
@@ -12,7 +13,8 @@ float LinearSoftmax::weightRegularizationL2() const {
   return sum;
 }
 
-float LinearSoftmax::lossForSingleImage(const std::vector<float>& image, const int& y) {
+float LinearSoftmax::lossForSingleImage(const std::vector<float>& image,
+                                        const int& y) {
   // Compute scores
   // scores = W*x
   std::vector<float> scores = computeScores(image);
@@ -119,7 +121,8 @@ std::vector<float> LinearSoftmax::inferenceLoss(const std::vector<float>& image,
 
   // 3. Normalize to get probabilities
   const float normalizer =
-      std::accumulate(unnormalized_probabilities.begin(), unnormalized_probabilities.end(), 0.0f);
+      std::accumulate(unnormalized_probabilities.begin(),
+                      unnormalized_probabilities.end(), 0.0f);
   std::vector<float> probabilities(classes_dim_, 0);
   for (size_t j = 0; j < classes_dim_; ++j) {
     probabilities[j] = unnormalized_probabilities[j] / normalizer;

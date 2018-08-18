@@ -6,9 +6,10 @@ int main() {
   // Load dataset
   CIFAR10Reader trainset;
 
-  std::vector<std::string> names = {"../CIFAR10/data_batch_1.bin", "../CIFAR10/data_batch_2.bin",
-                                    "../CIFAR10/data_batch_3.bin", "../CIFAR10/data_batch_4.bin",
-                                    "../CIFAR10/data_batch_5.bin"};
+  std::vector<std::string> names = {
+      "../CIFAR10/data_batch_1.bin", "../CIFAR10/data_batch_2.bin",
+      "../CIFAR10/data_batch_3.bin", "../CIFAR10/data_batch_4.bin",
+      "../CIFAR10/data_batch_5.bin"};
   for (int i = 0; i < names.size(); ++i) {
     trainset.readBin(names[i], false);
   }
@@ -87,13 +88,15 @@ int main() {
   // average parameter W1
   for (int x = 0; x < net1.W1.xSize(); ++x) {
     for (int y = 0; y < net1.W1.ySize(); ++y) {
-      ens.W1(x, y) = (net1.W1(x, y) + net2.W1(x, y) + net3.W1(x, y) + net4.W1(x, y)) / 4.0;
+      ens.W1(x, y) =
+          (net1.W1(x, y) + net2.W1(x, y) + net3.W1(x, y) + net4.W1(x, y)) / 4.0;
     }
   }
   // average parameter W2
   for (int x = 0; x < net1.W2.xSize(); ++x) {
     for (int y = 0; y < net1.W2.ySize(); ++y) {
-      net3.W2(x, y) = (net1.W2(x, y) + net2.W2(x, y) + net3.W2(x, y) + net4.W2(x, y)) / 4.0;
+      net3.W2(x, y) =
+          (net1.W2(x, y) + net2.W2(x, y) + net3.W2(x, y) + net4.W2(x, y)) / 4.0;
     }
   }
 
@@ -105,7 +108,8 @@ int main() {
     if (label == testset.labels()[i]) correct++;
     total++;
   }
-  std::cout << "Weight ensamble acc: " << correct / static_cast<float>(total) << std::endl;
+  std::cout << "Weight ensamble acc: " << correct / static_cast<float>(total)
+            << std::endl;
 
   correct = 0;
   total = 0;
@@ -124,7 +128,8 @@ int main() {
     if (label == testset.labels()[i]) correct++;
     total++;
   }
-  std::cout << "Ensamble acc: " << correct / static_cast<float>(total) << std::endl;
+  std::cout << "Ensamble acc: " << correct / static_cast<float>(total)
+            << std::endl;
 
   return 0;
 }

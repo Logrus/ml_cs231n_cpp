@@ -3,8 +3,9 @@
 #include "ui_mainwindow.h"
 
 namespace {
-const std::array<std::string, 10> kCIFAR10Labels = {"plane", "car",  "bird",  "cat",  "deer",
-                                                    "dog",   "frog", "horse", "ship", "truck"};
+const std::array<std::string, 10> kCIFAR10Labels = {
+    "plane", "car",  "bird",  "cat",  "deer",
+    "dog",   "frog", "horse", "ship", "truck"};
 
 QImage weight2image(const CMatrix<float>& w, const size_t label) {
   // \todo fix this 32
@@ -22,13 +23,15 @@ QImage weight2image(const CMatrix<float>& w, const size_t label) {
 }
 
 QImage cifarImageToQImage(const Image& cifar_image) {
-  QImage qimage(cifar_image.width(), cifar_image.height(), QImage::Format_RGB888);
+  QImage qimage(cifar_image.width(), cifar_image.height(),
+                QImage::Format_RGB888);
   for (size_t x = 0; x < cifar_image.width(); ++x) {
     for (size_t y = 0; y < cifar_image.height(); ++y) {
       int red = cifar_image(x, y, Image::Channel::RED);
       int green = cifar_image(x, y, Image::Channel::GREEN);
       int blue = cifar_image(x, y, Image::Channel::BLUE);
-      qimage.setPixel(static_cast<int>(x), static_cast<int>(y), qRgb(red, green, blue));
+      qimage.setPixel(static_cast<int>(x), static_cast<int>(y),
+                      qRgb(red, green, blue));
     }
   }
   return qimage;
@@ -36,7 +39,9 @@ QImage cifarImageToQImage(const Image& cifar_image) {
 }  // namespace
 
 MainWindow::MainWindow(QWidget* parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), classifier(new LinearSVM(10, 3073)) {
+    : QMainWindow(parent),
+      ui(new Ui::MainWindow),
+      classifier(new LinearSVM(10, 3073)) {
   ui->setupUi(this);
 
   classifier->initializeW();
@@ -45,7 +50,8 @@ MainWindow::MainWindow(QWidget* parent)
   // Learning rate
   ui->learningRateBox->setRange(0, 22);
   ui->learningRateBox->setSingleStep(1);
-  ui->learningRateBox->setValue(static_cast<int>(abs(log10(classifier->learning_rate_))));
+  ui->learningRateBox->setValue(
+      static_cast<int>(abs(log10(classifier->learning_rate_))));
 
   // Epochs
   ui->iterBox->setRange(1, 999);
@@ -120,26 +126,32 @@ void MainWindow::updateImage() {
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
   ui->piclabel_zoomed->setPixmap(QPixmap::fromImage(img));
   // Display the image's correct label
-  ui->labelLineEdit->setText(QString::fromStdString(kCIFAR10Labels[trainset.labels()[index]]));
+  ui->labelLineEdit->setText(
+      QString::fromStdString(kCIFAR10Labels[trainset.labels()[index]]));
 
   const size_t predicted_label = classifier->infer(trainset.images()[index]);
-  ui->predictionLineEdit->setText(QString::fromStdString(kCIFAR10Labels[predicted_label]));
+  ui->predictionLineEdit->setText(
+      QString::fromStdString(kCIFAR10Labels[predicted_label]));
 
-  const std::vector<float> scores = classifier->computeScores(trainset.images()[index]);
+  const std::vector<float> scores =
+      classifier->computeScores(trainset.images()[index]);
   for (size_t i = 0; i < ui_labels_score_.size(); ++i) {
-    ui_labels_score_[i]->setText(QString::number(static_cast<double>(scores[i]), 10, 5));
+    ui_labels_score_[i]->setText(
+        QString::number(static_cast<double>(scores[i]), 10, 5));
   }
 
   // Evaluate loss vector
-  std::vector<float> loss_vec =
-      classifier->inferenceLoss(trainset.images()[index], trainset.labels()[index]);
+  std::vector<float> loss_vec = classifier->inferenceLoss(
+      trainset.images()[index], trainset.labels()[index]);
   for (size_t i = 0; i < ui_labels_loss_.size(); ++i) {
-    ui_labels_loss_[i]->setText(QString::number(static_cast<double>(loss_vec[i]), 10, 5));
+    ui_labels_loss_[i]->setText(
+        QString::number(static_cast<double>(loss_vec[i]), 10, 5));
   }
 }
 
 void MainWindow::on_actionOpen_dataset_triggered() {
-  QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
+  QString folder_path =
+      QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
   if (folder_path.isEmpty()) return;
 
   QDir dir(folder_path);
@@ -195,7 +207,8 @@ float MainWindow::evaluateAcc() {
 
 void MainWindow::on_pushButton_clicked() {
   if (trainset.images().empty()) {
-    std::cerr << "Training set is empty! Unable to start training." << std::endl;
+    std::cerr << "Training set is empty! Unable to start training."
+              << std::endl;
   }
 
   stopped_ = false;
@@ -203,8 +216,8 @@ void MainWindow::on_pushButton_clicked() {
   int iters = static_cast<int>(trainset.images().size()) / bs;
   for (int epoch = 0; epoch < ui->iterBox->value(); epoch++) {
     for (int i = 0; i < iters; ++i) {
-      float loss =
-          classifier->computeLoss(trainset.images(), trainset.labels(), trainset.getBatchIdxs(bs));
+      float loss = classifier->computeLoss(trainset.images(), trainset.labels(),
+                                           trainset.getBatchIdxs(bs));
 
       ui->lossLabel->setText("Loss: " + QString::number(loss));
       visualizeWeights();
@@ -221,10 +234,13 @@ void MainWindow::on_pushButton_clicked() {
       ui->labeldWMax->setText("dWMax: " + QString::number(dWmax));
       ui->labeldWMin->setText("dWMin: " + QString::number(dWmin));
 
-      ui->labelUpdMax->setText("UpdMax: " + QString::number(dWmax * classifier->learning_rate_));
-      ui->labelUpdMin->setText("UpdMin: " + QString::number(dWmin * classifier->learning_rate_));
+      ui->labelUpdMax->setText(
+          "UpdMax: " + QString::number(dWmax * classifier->learning_rate_));
+      ui->labelUpdMin->setText(
+          "UpdMin: " + QString::number(dWmin * classifier->learning_rate_));
 
-      ui->labelRatio->setText("Ratio: " + QString::number(classifier->computeWeightRatio()));
+      ui->labelRatio->setText(
+          "Ratio: " + QString::number(classifier->computeWeightRatio()));
     }
 
     float acc = evaluateAcc();
@@ -244,8 +260,8 @@ void MainWindow::on_resetButton_clicked() {
 
 void MainWindow::on_learningRateBox_valueChanged(int lr_exp) {
   classifier->learning_rate_ = std::pow(10.f, -ui->learningRateBox->value());
-  std::cout << "New learning rate value " << std::pow(10.f, -ui->learningRateBox->value())
-            << std::endl;
+  std::cout << "New learning rate value "
+            << std::pow(10.f, -ui->learningRateBox->value()) << std::endl;
 }
 
 void MainWindow::on_SVMRadioButton_clicked() {
@@ -291,7 +307,8 @@ void MainWindow::on_buttonMeanImage_clicked() {
     }
   }
 
-  img = img.scaled(ui->labelMeanImage->width(), ui->labelMeanImage->height(), Qt::KeepAspectRatio);
+  img = img.scaled(ui->labelMeanImage->width(), ui->labelMeanImage->height(),
+                   Qt::KeepAspectRatio);
   ui->labelMeanImage->setPixmap(QPixmap::fromImage(img));
 
   auto minmax = trainset.minmax();
@@ -339,7 +356,8 @@ void MainWindow::on_buttonStandardize_clicked() {
     }
   }
 
-  img = img.scaled(ui->labelMeanImage->width(), ui->labelMeanImage->height(), Qt::KeepAspectRatio);
+  img = img.scaled(ui->labelMeanImage->width(), ui->labelMeanImage->height(),
+                   Qt::KeepAspectRatio);
   ui->labelMeanImage->setPixmap(QPixmap::fromImage(img));
 
   // Show std image
@@ -353,7 +371,8 @@ void MainWindow::on_buttonStandardize_clicked() {
     }
   }
 
-  img2 = img2.scaled(ui->stdImage->width(), ui->stdImage->height(), Qt::KeepAspectRatio);
+  img2 = img2.scaled(ui->stdImage->width(), ui->stdImage->height(),
+                     Qt::KeepAspectRatio);
   ui->stdImage->setPixmap(QPixmap::fromImage(img2));
 
   auto minmax = trainset.minmax();
@@ -363,7 +382,8 @@ void MainWindow::on_buttonStandardize_clicked() {
 }
 
 void MainWindow::on_buttonNormalize_clicked() {
-  std::cerr << "WARNING: normalization isn't implemented correctly now!" << std::endl;
+  std::cerr << "WARNING: normalization isn't implemented correctly now!"
+            << std::endl;
   if (!trainset.normalize()) {
     std::cerr << "Unable to normalize training set" << std::endl;
     return;

@@ -16,15 +16,18 @@ class LinearSoftmax : public Classifier {
 
   /**
    * @brief Computes SVM L2 regularization term W^2
-   * @return float representing elementwise sum of squares of weight matrix elements
+   * @return float representing elementwise sum of squares of weight matrix
+   * elements
    */
   float weightRegularizationL2() const override;
 
   float lossForSingleImage(const std::vector<float>& image, const int& y);
-  float computeLoss(const std::vector<std::vector<float> >& images, const std::vector<int>& labels,
+  float computeLoss(const std::vector<std::vector<float> >& images,
+                    const std::vector<int>& labels,
                     const std::vector<size_t>& indexies) override;
 
   size_t infer(const std::vector<float>& image) const override;
 
-  std::vector<float> inferenceLoss(const std::vector<float>& image, const size_t y) const override;
+  std::vector<float> inferenceLoss(const std::vector<float>& image,
+                                   const size_t y) const override;
 };

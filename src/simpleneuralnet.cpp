@@ -1,7 +1,11 @@
 #include <classifiers/simpleneuralnet.h>
 
-SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size, int output_size, float std)
-    : input_size_(input_size), hidden_size_(hidden_size), output_size_(output_size), std_(std) {
+SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size,
+                                 int output_size, float std)
+    : input_size_(input_size),
+      hidden_size_(hidden_size),
+      output_size_(output_size),
+      std_(std) {
   // Initialize hyperparameters
   learning_rate = 1e-4;
   lambda = 0.5;
@@ -12,7 +16,8 @@ SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size, int output_siz
 }
 
 float SimpleNeuralNet::loss(const std::vector<std::vector<float>>& images,
-                            const std::vector<int>& labels, const std::vector<size_t>& batch_idx) {
+                            const std::vector<int>& labels,
+                            const std::vector<size_t>& batch_idx) {
   // Reset gradience between batches
   dW1.fill(0.f);
   dW2.fill(0.f);
@@ -132,7 +137,8 @@ float SimpleNeuralNet::loss(const std::vector<std::vector<float>>& images,
   return L;
 }
 
-float SimpleNeuralNet::loss_one_image(const std::vector<float>& image, const int& y) {
+float SimpleNeuralNet::loss_one_image(const std::vector<float>& image,
+                                      const int& y) {
   // **********************
   //  Compute forward pass
   // **********************
@@ -244,7 +250,8 @@ int SimpleNeuralNet::inference(const std::vector<float>& image) {
   return std::max_element(scores.begin(), scores.end()) - scores.begin();
 }
 
-std::vector<float> SimpleNeuralNet::inference_scores(const std::vector<float>& image) {
+std::vector<float> SimpleNeuralNet::inference_scores(
+    const std::vector<float>& image) {
   // **********************
   //  Compute forward pass
   // **********************

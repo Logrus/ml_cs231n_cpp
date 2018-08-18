@@ -6,7 +6,8 @@
 class ClassifierInterface {
  public:
   virtual float weightRegularizationL2() const = 0;
-  virtual float lossForSingleImage(const std::vector<float>& image, const int& y) = 0;
+  virtual float lossForSingleImage(const std::vector<float>& image,
+                                   const int& y) = 0;
   virtual float computeLoss(const std::vector<std::vector<float> >& images,
                             const std::vector<int>& labels,
                             const std::vector<size_t>& indexies) = 0;
@@ -23,10 +24,12 @@ class Classifier : public ClassifierInterface {
    * @param dimentionality_classes
    * @param dimentionality_data
    */
-  Classifier(const unsigned dimentionality_classes, const unsigned dimentionality_data);
+  Classifier(const unsigned dimentionality_classes,
+             const unsigned dimentionality_data);
 
   /**
-   * @brief initializeW Initializes weights with samples form zero mean normal distribution
+   * @brief initializeW Initializes weights with samples form zero mean normal
+   * distribution
    */
   virtual void initializeW(const float std = 0.00001f);
 
