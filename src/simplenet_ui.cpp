@@ -10,16 +10,16 @@ SimpleNetUI::SimpleNetUI(QWidget* parent)
   classifier->initializeW();
 
   // TODO: remove later
-  label_names.push_back("plane");
-  label_names.push_back("car");
-  label_names.push_back("bird");
-  label_names.push_back("cat");
-  label_names.push_back("deer");
-  label_names.push_back("dog");
-  label_names.push_back("frog");
-  label_names.push_back("horse");
-  label_names.push_back("ship");
-  label_names.push_back("truck");
+  label_names.emplace_back("plane");
+  label_names.emplace_back("car");
+  label_names.emplace_back("bird");
+  label_names.emplace_back("cat");
+  label_names.emplace_back("deer");
+  label_names.emplace_back("dog");
+  label_names.emplace_back("frog");
+  label_names.emplace_back("horse");
+  label_names.emplace_back("ship");
+  label_names.emplace_back("truck");
 
   //  QDir dir("../CIFAR10/");
 
@@ -218,7 +218,7 @@ void SimpleNetUI::on_actionOpen_dataset_triggered() {
   // updateImage();
 }
 
-void weight2image(CMatrix<float> w, int label, QImage& img) {
+void weight2image(const CMatrix<float>& w, int label, QImage& img) {
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
       int red = w(label, y * 32 + x);
@@ -237,11 +237,11 @@ void SimpleNetUI::visualizeWeights() {
     int ix = i / 7;
     int iy = i % 7;
     // delete TableWidget->item(ix, iy);
-    QImage* img = new QImage(32, 32, QImage::Format_RGB888);
+    auto* img = new QImage(32, 32, QImage::Format_RGB888);
     weight2image(normW, i, *img);
     *img = img->scaled(100, 100);
 
-    QTableWidgetItem* item = new QTableWidgetItem;
+    auto* item = new QTableWidgetItem;
     item->setData(Qt::DecorationRole, QPixmap::fromImage(*img));
     TableWidget->setItem(ix, iy, item);
     delete img;
@@ -379,7 +379,7 @@ void SimpleNetUI::on_pushButton_clicked() {
   }
 }
 
-void SimpleNetUI::on_labelSpinBox_valueChanged(int arg1) { updateImage(); }
+void SimpleNetUI::on_labelSpinBox_valueChanged(int  /*arg1*/) { updateImage(); }
 
 void SimpleNetUI::on_stopButton_clicked() { stopped_ = true; }
 
@@ -391,7 +391,7 @@ void SimpleNetUI::on_resetButton_clicked() {
   loss_stats.clear();
 }
 
-void SimpleNetUI::on_learningRateBox_valueChanged(int lr_exp) {
+void SimpleNetUI::on_learningRateBox_valueChanged(int  /*lr_exp*/) {
   classifier->learning_rate = std::pow(10.f, -ui->learningRateBox->value());
   std::cout << "New learning rate value " << std::pow(10.f, -ui->learningRateBox->value())
             << std::endl;

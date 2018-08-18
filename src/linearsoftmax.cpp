@@ -100,7 +100,7 @@ size_t LinearSoftmax::infer(const std::vector<float>& image) const {
 }
 
 std::vector<float> LinearSoftmax::inferenceLoss(const std::vector<float>& image,
-                                                const size_t y) const {
+                                                const size_t  /*y*/) const {
   // Compute scores
   // scores = W*x
   std::vector<float> scores = computeScores(image);

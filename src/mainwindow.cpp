@@ -1,5 +1,6 @@
 #include <classifiers/mainwindow.h>
 #include <array>
+#include <memory>
 #include "ui_mainwindow.h"
 
 namespace {
@@ -116,7 +117,7 @@ MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::updateImage() {
   // Chose what image from CIFAR dataset to display
-  const size_t index = static_cast<size_t>(ui->labelSpinBox->value());
+  const auto index = static_cast<size_t>(ui->labelSpinBox->value());
   Image cifar_image;
   if (!trainset.getImage(index, cifar_image)) {
     std::cerr << "Unable to get image from the trainset!";
@@ -249,7 +250,7 @@ void MainWindow::on_pushButton_clicked() {
   }
 }
 
-void MainWindow::on_labelSpinBox_valueChanged(int arg1) { updateImage(); }
+void MainWindow::on_labelSpinBox_valueChanged(int  /*arg1*/) { updateImage(); }
 
 void MainWindow::on_stopButton_clicked() { stopped_ = true; }
 
@@ -258,7 +259,7 @@ void MainWindow::on_resetButton_clicked() {
   visualizeWeights();
 }
 
-void MainWindow::on_learningRateBox_valueChanged(int lr_exp) {
+void MainWindow::on_learningRateBox_valueChanged(int  /*lr_exp*/) {
   classifier->learning_rate_ = std::pow(10.f, -ui->learningRateBox->value());
   std::cout << "New learning rate value "
             << std::pow(10.f, -ui->learningRateBox->value()) << std::endl;
@@ -266,14 +267,14 @@ void MainWindow::on_learningRateBox_valueChanged(int lr_exp) {
 
 void MainWindow::on_SVMRadioButton_clicked() {
   gW = classifier->W_;
-  classifier.reset(new LinearSVM(10, 3073));
+  classifier = std::make_unique<LinearSVM>(10, 3073);
   classifier->copyW(gW);
   visualizeWeights();
 }
 
 void MainWindow::on_SoftmaxRadioButton_clicked() {
   gW = classifier->W_;
-  classifier.reset(new LinearSoftmax(10, 3073));
+  classifier = std::make_unique<LinearSoftmax>(10, 3073);
   classifier->copyW(gW);
   visualizeWeights();
 }

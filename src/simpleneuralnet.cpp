@@ -61,12 +61,12 @@ float SimpleNeuralNet::loss(const std::vector<std::vector<float>>& images,
     }
   }
 
-  for (int i = 0; i < db2.size(); ++i) {
-    db2[i] /= static_cast<float>(N);
+  for (float & i : db2) {
+    i /= static_cast<float>(N);
   }
 
-  for (int i = 0; i < db1.size(); ++i) {
-    db1[i] /= static_cast<float>(N);
+  for (float & i : db1) {
+    i /= static_cast<float>(N);
   }
 
   // **********************
@@ -351,7 +351,7 @@ void SimpleNeuralNet::initializeW() {
   beta2 = 0.999;
 }
 
-bool SimpleNeuralNet::saveWeights(std::string filename) {
+bool SimpleNeuralNet::saveWeights(const std::string& filename) {
   std::ofstream file;
   file.open(filename, std::ofstream::binary);
 
@@ -390,7 +390,7 @@ bool SimpleNeuralNet::saveWeights(std::string filename) {
   return true;
 }
 
-bool SimpleNeuralNet::loadWeights(std::string filename) {
+bool SimpleNeuralNet::loadWeights(const std::string& filename) {
   std::ifstream file;
   file.open(filename, std::ifstream::binary);
 

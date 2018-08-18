@@ -26,7 +26,7 @@ bool CIFAR10Reader::readBin(const std::string& filepath,
     // push to the vector of labels
     labels_.emplace_back(tplabel);
 
-    std::array<unsigned char, kNumOfChannels * KNRows * KNCols> buffer;
+    std::array<unsigned char, kNumOfChannels * KNRows * KNCols> buffer{};
     file.read(reinterpret_cast<char*>(buffer.data()), buffer.size());
     if (!file.good()) {
       std::cerr << "Error while reading CIFAR10 dataset!" << std::endl;
@@ -79,8 +79,8 @@ void CIFAR10Reader::computeStdImage() {
       std_image_[pix] += diff * diff;
     }
   }
-  for (size_t d = 0; d < std_image_.size(); ++d) {
-    std_image_[d] = sqrtf(std_image_[d] / const_images_.size());
+  for (float & d : std_image_) {
+    d = sqrtf(d / const_images_.size());
   }
 }
 
@@ -93,10 +93,10 @@ bool CIFAR10Reader::normalize() {
   }
   auto minmax = this->minmax();
   float range = minmax.second - minmax.first;
-  for (size_t i = 0; i < images_.size(); ++i) {
-    std::vector<float>* image = &images_[i];
-    for (size_t d = 0; d < image->size(); ++d) {
-      image->at(d) = (image->at(d)) / range;
+  for (auto & i : images_) {
+    std::vector<float>* image = &i;
+    for (float & d : *image) {
+      d = d / range;
     }
   }
   state_ = PreprocessingType::NORMALIZED;
@@ -202,8 +202,8 @@ bool CIFAR10Reader::datasetIsLoaded() const {
 std::pair<float, float> CIFAR10Reader::minmax() {
   float gmin = std::numeric_limits<float>::max();
   float gmax = std::numeric_limits<float>::min();
-  for (size_t i = 0; i < images_.size(); ++i) {
-    const std::vector<float>* image = &images_[i];
+  for (auto & i : images_) {
+    const std::vector<float>* image = &i;
     auto minmax = std::minmax_element(image->begin(), image->end());
     if (*minmax.first < gmin) gmin = *minmax.first;
     if (*minmax.second > gmax) gmax = *minmax.second;

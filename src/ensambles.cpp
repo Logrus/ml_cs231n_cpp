@@ -10,8 +10,8 @@ int main() {
       "../CIFAR10/data_batch_1.bin", "../CIFAR10/data_batch_2.bin",
       "../CIFAR10/data_batch_3.bin", "../CIFAR10/data_batch_4.bin",
       "../CIFAR10/data_batch_5.bin"};
-  for (int i = 0; i < names.size(); ++i) {
-    trainset.readBin(names[i], false);
+  for (const auto & name : names) {
+    trainset.readBin(name, false);
   }
 
   // Demean test set

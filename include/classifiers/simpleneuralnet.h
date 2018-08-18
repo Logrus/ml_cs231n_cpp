@@ -32,8 +32,8 @@ class SimpleNeuralNet {
   std::vector<float> inference_scores(const std::vector<float>& image);
 
   void initializeW();
-  bool saveWeights(std::string filename);
-  bool loadWeights(std::string filename);
+  bool saveWeights(const std::string& filename);
+  bool loadWeights(const std::string& filename);
 
   // Weights
   CMatrix<float> W1;
@@ -56,8 +56,8 @@ class SimpleNeuralNet {
   CMatrix<float> mW1;
   CMatrix<float> mW2;
   std::vector<float> mb1, mb2;
-  int t;
-  float beta1, beta2;
+  int t{};
+  float beta1{}, beta2{};
 
   // Scores
   std::vector<float> S;
