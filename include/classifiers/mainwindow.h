@@ -68,6 +68,7 @@ class MainWindow : public QMainWindow {
 
   std::vector<QLabel*> ui_labels_score_;
   std::vector<QLabel*> ui_labels_loss_;
+  std::vector<QLabel*> ui_weight_labels_;
 
   bool stopped_ = false;
 

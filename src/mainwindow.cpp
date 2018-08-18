@@ -5,7 +5,7 @@ namespace {
 const std::vector<std::string> kCIFAR10Labels = {"plane", "car",  "bird",  "cat",  "deer",
                                                  "dog",   "frog", "horse", "ship", "truck"};
 
-void weight2image(CMatrix<float> w, int label, QImage& img) {
+void weight2image(const CMatrix<float>& w, const size_t label, QImage& img) {
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
       int red = w(label, y * 32 + x);
@@ -64,6 +64,18 @@ MainWindow::MainWindow(QWidget* parent)
   ui_labels_loss_.push_back(ui->labelHorseLoss);
   ui_labels_loss_.push_back(ui->labelShipLoss);
   ui_labels_loss_.push_back(ui->labelTruckLoss);
+
+  // \todo
+  ui_weight_labels_.push_back(ui->w1label);
+  ui_weight_labels_.push_back(ui->w2label);
+  ui_weight_labels_.push_back(ui->w3label);
+  ui_weight_labels_.push_back(ui->w4label);
+  ui_weight_labels_.push_back(ui->w5label);
+  ui_weight_labels_.push_back(ui->w6label);
+  ui_weight_labels_.push_back(ui->w7label);
+  ui_weight_labels_.push_back(ui->w8label);
+  ui_weight_labels_.push_back(ui->w9label);
+  ui_weight_labels_.push_back(ui->w10label);
 
   resetUI();
 }
@@ -140,64 +152,17 @@ void MainWindow::on_actionOpen_dataset_triggered() {
 }
 
 void MainWindow::visualizeWeights() {
-  /// \todo wtf, refactor
-  QImage img0(32, 32, QImage::Format_RGB888);
-  QImage img1(32, 32, QImage::Format_RGB888);
-  QImage img2(32, 32, QImage::Format_RGB888);
-  QImage img3(32, 32, QImage::Format_RGB888);
-  QImage img4(32, 32, QImage::Format_RGB888);
-  QImage img5(32, 32, QImage::Format_RGB888);
-  QImage img6(32, 32, QImage::Format_RGB888);
-  QImage img7(32, 32, QImage::Format_RGB888);
-  QImage img8(32, 32, QImage::Format_RGB888);
-  QImage img9(32, 32, QImage::Format_RGB888);
-
   CMatrix<float> normW = classifier->W_;
   normW.normalize(0, 255);
-
-  weight2image(normW, 0, img0);
-  weight2image(normW, 1, img1);
-  weight2image(normW, 2, img2);
-  weight2image(normW, 3, img3);
-  weight2image(normW, 4, img4);
-  weight2image(normW, 5, img5);
-  weight2image(normW, 6, img6);
-  weight2image(normW, 7, img7);
-  weight2image(normW, 8, img8);
-  weight2image(normW, 9, img9);
-
-  img0 = img0.scaledToWidth(ui->w1label->width(), Qt::SmoothTransformation);
-  img1 = img1.scaledToWidth(ui->w2label->width(), Qt::SmoothTransformation);
-  img2 = img2.scaledToWidth(ui->w3label->width(), Qt::SmoothTransformation);
-  img3 = img3.scaledToWidth(ui->w4label->width(), Qt::SmoothTransformation);
-  img4 = img4.scaledToWidth(ui->w5label->width(), Qt::SmoothTransformation);
-  img5 = img5.scaledToWidth(ui->w6label->width(), Qt::SmoothTransformation);
-  img6 = img6.scaledToWidth(ui->w7label->width(), Qt::SmoothTransformation);
-  img7 = img7.scaledToWidth(ui->w8label->width(), Qt::SmoothTransformation);
-  img8 = img8.scaledToWidth(ui->w9label->width(), Qt::SmoothTransformation);
-  img9 = img9.scaledToWidth(ui->w10label->width(), Qt::SmoothTransformation);
-
-  ui->w1label->setPixmap(QPixmap::fromImage(img0));
-  ui->w2label->setPixmap(QPixmap::fromImage(img1));
-  ui->w3label->setPixmap(QPixmap::fromImage(img2));
-  ui->w4label->setPixmap(QPixmap::fromImage(img3));
-  ui->w5label->setPixmap(QPixmap::fromImage(img4));
-  ui->w6label->setPixmap(QPixmap::fromImage(img5));
-  ui->w7label->setPixmap(QPixmap::fromImage(img6));
-  ui->w8label->setPixmap(QPixmap::fromImage(img7));
-  ui->w9label->setPixmap(QPixmap::fromImage(img8));
-  ui->w10label->setPixmap(QPixmap::fromImage(img9));
-
-  ui->w1label->show();
-  ui->w2label->show();
-  ui->w3label->show();
-  ui->w4label->show();
-  ui->w5label->show();
-  ui->w6label->show();
-  ui->w7label->show();
-  ui->w8label->show();
-  ui->w9label->show();
-  ui->w10label->show();
+  for (size_t i = 0; i < ui_weight_labels_.size(); ++i) {
+    auto& weight_label = ui_weight_labels_[i];
+    // \todo remove hard coded size
+    QImage img(32, 32, QImage::Format_RGB888);
+    weight2image(normW, i, img);
+    img = img.scaledToWidth(weight_label->width(), Qt::SmoothTransformation);
+    weight_label->setPixmap(QPixmap::fromImage(img));
+    weight_label->show();
+  }
 }
 
 float MainWindow::evaluateAcc() {
