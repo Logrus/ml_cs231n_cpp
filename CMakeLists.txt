@@ -84,6 +84,7 @@ include_directories(include 3rdparty ${CMAKE_CURRENT_BINARY_DIR})
 
 add_executable  (${PROJECT_NAME} ${project_SOURCES}
                                  ${project_FORMS_HEADERS}
+                                 ${project_HEADERS}
                                  ${project_HEADERS_MOC})
 
 target_link_libraries (${PROJECT_NAME} ${QT_LIBRARIES})
@@ -115,7 +116,7 @@ add_custom_target(copy_custom_plot ALL
     COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/3rdparty/qcustomplot/qcustomplot.h ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-add_executable(simple_net ${net_SOURCES} ${net_HEADERS_MOC} ${net_FORMS_HEADERS})
+add_executable(simple_net ${net_SOURCES} ${net_HEADERS_MOC} ${net_HEADERS} ${net_FORMS_HEADERS})
 target_link_libraries (simple_net ${QT_LIBRARIES})
 add_dependencies(simple_net copy_custom_plot)
 
