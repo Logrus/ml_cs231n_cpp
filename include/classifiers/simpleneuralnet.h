@@ -1,15 +1,11 @@
-#ifndef SIMPLENEURALNET_H
-#define SIMPLENEURALNET_H
-#include <assert.h>
+#pragma once
 #include <uni_freiburg_cv/CMatrix.h>
 #include <algorithm>
+#include <cassert>
 #include <chrono>
 #include <numeric>
 #include <random>
 #include <vector>
-
-typedef std::vector<std::vector<float> > vvfloat;
-typedef std::vector<int> vint;
 
 class SimpleNeuralNet {
  public:
@@ -26,7 +22,8 @@ class SimpleNeuralNet {
   int output_size_;
   float std_;
 
-  float loss(const vvfloat& images, const vint& labels, const std::vector<size_t>& batch_idx);
+  float loss(const std::vector<std::vector<float>>& images, const std::vector<int>& labels,
+             const std::vector<size_t>& batch_idx);
   float loss_one_image(const std::vector<float>& image, const int& y);
 
   int inference(const std::vector<float>& image);
@@ -68,5 +65,3 @@ class SimpleNeuralNet {
   std::vector<float> H_;
   std::vector<float> neural_statistics;
 };
-
-#endif  // SIMPLENEURALNET_H

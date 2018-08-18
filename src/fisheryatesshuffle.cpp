@@ -2,7 +2,7 @@
 #include <cassert>
 
 FisherYatesShuffle::FisherYatesShuffle(const size_t n_elements)
-    : n_elements_(n_elements), gen_(r_()) {
+    : n_elements_(n_elements), gen_(r_()), max_(n_elements) {
   setNelem(n_elements_);
 }
 
@@ -22,7 +22,7 @@ std::vector<size_t> FisherYatesShuffle::getRandomIndexies(const int n) {
     // Get a random number between 0 and max_-1
     std::uniform_int_distribution<size_t> uniform_dist(0, max_ - 1);
 
-    const size_t index = static_cast<size_t>(uniform_dist(gen_));
+    const auto index = static_cast<size_t>(uniform_dist(gen_));
     assert(index >= 0 && index < indexies_.size());
 
     result.emplace_back(indexies_[index]);

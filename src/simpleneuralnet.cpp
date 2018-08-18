@@ -11,8 +11,8 @@ SimpleNeuralNet::SimpleNeuralNet(int input_size, int hidden_size, int output_siz
   initializeW();
 }
 
-float SimpleNeuralNet::loss(const vvfloat& images, const vint& labels,
-                            const std::vector<size_t>& batch_idx) {
+float SimpleNeuralNet::loss(const std::vector<std::vector<float>>& images,
+                            const std::vector<int>& labels, const std::vector<size_t>& batch_idx) {
   // Reset gradience between batches
   dW1.fill(0.f);
   dW2.fill(0.f);

@@ -9,7 +9,8 @@ constexpr int KNRows = 32;
 constexpr int KNCols = 32;
 }  // namespace
 
-bool CIFAR10Reader::readBin(const std::string filepath, const bool bias_trick = false) {
+bool CIFAR10Reader::readBin(const std::string& filepath,
+                            const bool bias_trick = false) {
   std::cout << "Reading " << filepath << std::endl;
 
   std::ifstream file(filepath.c_str(), std::ios::binary);
@@ -54,7 +55,7 @@ void CIFAR10Reader::computeMeanImage() {
   // Compute mean image
   mean_image_.resize(const_images_.front().size(), 0.f);
 
-  const float num_images = static_cast<float>(const_images_.size());
+  const auto num_images = static_cast<float>(const_images_.size());
   for (const auto& image : const_images_) {
     for (size_t pix = 0; pix < image.size(); ++pix) {
       mean_image_[pix] += image.at(pix) / num_images;
@@ -150,7 +151,8 @@ bool CIFAR10Reader::demean() {
   // Print some helpful info into console
   std::cout << "Subtracted mean from every image." << std::endl;
   auto minmax = std::minmax_element(mean_image_.begin(), mean_image_.end());
-  std::cout << "Mean image min " << *minmax.first << " max " << *minmax.second << std::endl;
+  std::cout << "Mean image min " << *minmax.first << " max " << *minmax.second
+            << std::endl;
   state_ = PreprocessingType::DEMEANED;
   return true;
 }
@@ -172,16 +174,19 @@ bool CIFAR10Reader::getImage(const size_t index, Image& image) const {
 }
 
 bool CIFAR10Reader::meanImageIsComputed() const {
-  return !mean_image_.empty() && images_.size() > 1 && mean_image_.size() == images_.front().size();
+  return !mean_image_.empty() && images_.size() > 1 &&
+         mean_image_.size() == images_.front().size();
 }
 
 bool CIFAR10Reader::stdImageIsComputed() const {
-  return !std_image_.empty() && images_.size() > 1 && std_image_.size() == images_.front().size();
+  return !std_image_.empty() && images_.size() > 1 &&
+         std_image_.size() == images_.front().size();
 }
 
 bool CIFAR10Reader::datasetWasPreprocessed() const {
   if (state_ != PreprocessingType::NO_PREPROCESSING) {
-    std::cerr << "The images have already been preprocessed, please undo previous preprocessing "
+    std::cerr << "The images have already been preprocessed, please undo "
+                 "previous preprocessing "
                  "via clicking reset before proceeding."
               << std::endl;
     return true;
@@ -190,7 +195,8 @@ bool CIFAR10Reader::datasetWasPreprocessed() const {
 }
 
 bool CIFAR10Reader::datasetIsLoaded() const {
-  return !images_.empty() && !const_images_.empty() && images_.size() == const_images_.size();
+  return !images_.empty() && !const_images_.empty() &&
+         images_.size() == const_images_.size();
 }
 
 std::pair<float, float> CIFAR10Reader::minmax() {

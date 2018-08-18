@@ -2,9 +2,10 @@
 
 // Has to be in cpp file to avoid
 // -Wweak-vtables warning
-ClassifierInterface::~ClassifierInterface() {}
+ClassifierInterface::~ClassifierInterface() = default;
 
-Classifier::Classifier(const unsigned dimentionality_classes, const unsigned dimentionality_data)
+Classifier::Classifier(const unsigned dimentionality_classes,
+                       const unsigned dimentionality_data)
     : classes_dim_(dimentionality_classes),
       data_dim_(dimentionality_data),
       lambda_(0.5),
@@ -18,7 +19,8 @@ Classifier::Classifier(const unsigned dimentionality_classes, const unsigned dim
 
 void Classifier::copyW(const CMatrix<float>& inW) { W_ = inW; }
 
-std::vector<float> Classifier::computeScores(const std::vector<float>& x) const {
+std::vector<float> Classifier::computeScores(
+    const std::vector<float>& x) const {
   std::vector<float> scores(classes_dim_, 0.f);
 
   for (size_t c = 0; c < classes_dim_; ++c) {
@@ -35,7 +37,8 @@ float Classifier::computeWeightRatio() const {
   for (int x = 0; x < W_.xSize(); ++x) {
     for (int y = 0; y < W_.ySize(); ++y) {
       weight += static_cast<long double>(W_(x, y) * W_(x, y));
-      update += static_cast<long double>(dW_(x, y) * learning_rate_ * dW_(x, y) * learning_rate_);
+      update += static_cast<long double>(dW_(x, y) * learning_rate_ *
+                                         dW_(x, y) * learning_rate_);
     }
   }
   // Narrowing down precision after computing ratio

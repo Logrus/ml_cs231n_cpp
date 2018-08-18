@@ -26,18 +26,20 @@ class Image {
   Image() = default;
   Image(const size_t width, const size_t height, const size_t channels)
       : width_(width), height_(height), channels_(channels) {}
-  Image(const std::vector<float>& float_image, const size_t width, const size_t height,
-        const size_t channels)
+  Image(const std::vector<float>& float_image, const size_t width,
+        const size_t height, const size_t channels)
       : Image(width, height, channels) {
     // Convert float image to the specified type
     // Supposed to be unsigned char for the most use cases
     data_.assign(float_image.begin(), float_image.end());
   }
 
-  unsigned char operator()(const size_t x, const size_t y, const size_t c) const {
+  unsigned char operator()(const size_t x, const size_t y,
+                           const size_t c) const {
     return data_[x + y * width_ + c * width_ * height_];
   }
-  unsigned char operator()(const size_t x, const size_t y, const Channel c) const {
+  unsigned char operator()(const size_t x, const size_t y,
+                           const Channel c) const {
     return operator()(x, y, static_cast<size_t>(c));
   }
 
@@ -54,7 +56,7 @@ class Image {
 class CIFAR10Reader {
  public:
   CIFAR10Reader() : state_(PreprocessingType::NO_PREPROCESSING) {}
-  bool readBin(std::string filepath, const bool bias_trick);
+  bool readBin(const std::string& filepath, const bool bias_trick);
 
   // Data processing
   void computeMeanImage();
@@ -64,8 +66,12 @@ class CIFAR10Reader {
   bool demean();
   bool reset();
 
-  void setMeanImage(const std::vector<float>& mean_image) { mean_image_ = mean_image; }
-  void setStdImage(const std::vector<float>& std_image) { std_image_ = std_image; }
+  void setMeanImage(const std::vector<float>& mean_image) {
+    mean_image_ = mean_image;
+  }
+  void setStdImage(const std::vector<float>& std_image) {
+    std_image_ = std_image;
+  }
   bool getImage(const size_t index, Image& image) const;
   bool meanImageIsComputed() const;
   bool stdImageIsComputed() const;
