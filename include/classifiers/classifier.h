@@ -10,7 +10,7 @@ class ClassifierInterface {
   virtual float computeLoss(const std::vector<std::vector<float> >& images,
                             const std::vector<int>& labels,
                             const std::vector<size_t>& indexies) = 0;
-  virtual int infer(const std::vector<float>& image) const = 0;
+  virtual size_t infer(const std::vector<float>& image) const = 0;
   virtual std::vector<float> inferenceLoss(const std::vector<float>& image,
                                            const size_t y) const = 0;
   virtual ~ClassifierInterface();

@@ -24,7 +24,7 @@ class LinearSoftmax : public Classifier {
   float computeLoss(const std::vector<std::vector<float> >& images, const std::vector<int>& labels,
                     const std::vector<size_t>& indexies) override;
 
-  int infer(const std::vector<float>& image) const override;
+  size_t infer(const std::vector<float>& image) const override;
 
   std::vector<float> inferenceLoss(const std::vector<float>& image, const size_t y) const override;
 };

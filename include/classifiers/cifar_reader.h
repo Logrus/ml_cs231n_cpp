@@ -66,8 +66,7 @@ class CIFAR10Reader {
 
   void setMeanImage(const std::vector<float>& mean_image) { mean_image_ = mean_image; }
   void setStdImage(const std::vector<float>& std_image) { std_image_ = std_image; }
-  Image getImage(const size_t index) const;
-
+  bool getImage(const size_t index, Image& image) const;
   bool meanImageIsComputed() const;
   bool stdImageIsComputed() const;
   bool datasetWasPreprocessed() const;

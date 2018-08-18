@@ -91,7 +91,7 @@ float LinearSoftmax::computeLoss(const std::vector<std::vector<float> >& images,
   return L;
 }
 
-int LinearSoftmax::infer(const std::vector<float>& image) const {
+size_t LinearSoftmax::infer(const std::vector<float>& image) const {
   const std::vector<float> scores = computeScores(image);
   // Get the index of the max element
   return std::max_element(scores.begin(), scores.end()) - scores.begin();

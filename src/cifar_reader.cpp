@@ -163,9 +163,12 @@ bool CIFAR10Reader::reset() {
   return true;
 }
 
-Image CIFAR10Reader::getImage(const size_t index) const {
-  if (!datasetIsLoaded()) return Image();
-  return Image(const_images_.at(index), KNCols, KNRows, kNumOfChannels);
+bool CIFAR10Reader::getImage(const size_t index, Image& image) const {
+  if (datasetIsLoaded() && index < const_images_.size()) {
+    image = Image(const_images_.at(index), KNCols, KNRows, kNumOfChannels);
+    return true;
+  }
+  return false;
 }
 
 bool CIFAR10Reader::meanImageIsComputed() const {

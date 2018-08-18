@@ -1,19 +1,37 @@
 #include <classifiers/mainwindow.h>
+#include <array>
 #include "ui_mainwindow.h"
 
 namespace {
-const std::vector<std::string> kCIFAR10Labels = {"plane", "car",  "bird",  "cat",  "deer",
-                                                 "dog",   "frog", "horse", "ship", "truck"};
+const std::array<std::string, 10> kCIFAR10Labels = {"plane", "car",  "bird",  "cat",  "deer",
+                                                    "dog",   "frog", "horse", "ship", "truck"};
 
-void weight2image(const CMatrix<float>& w, const size_t label, QImage& img) {
+QImage weight2image(const CMatrix<float>& w, const size_t label) {
+  // \todo fix this 32
+  QImage qimage(32, 32, QImage::Format_RGB888);
   for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
       int red = w(label, y * 32 + x);
       int green = w(label, 1024 + y * 32 + x);
       int blue = w(label, 2048 + y * 32 + x);
-      img.setPixel(x, y, qRgb(red, green, blue));
+      qimage.setPixel(x, y, qRgb(red, green, blue));
     }
   }
+
+  return qimage;
+}
+
+QImage cifarImageToQImage(const Image& cifar_image) {
+  QImage qimage(cifar_image.width(), cifar_image.height(), QImage::Format_RGB888);
+  for (size_t x = 0; x < cifar_image.width(); ++x) {
+    for (size_t y = 0; y < cifar_image.height(); ++y) {
+      int red = cifar_image(x, y, Image::Channel::RED);
+      int green = cifar_image(x, y, Image::Channel::GREEN);
+      int blue = cifar_image(x, y, Image::Channel::BLUE);
+      qimage.setPixel(static_cast<int>(x), static_cast<int>(y), qRgb(red, green, blue));
+    }
+  }
+  return qimage;
 }
 }  // namespace
 
@@ -77,35 +95,37 @@ MainWindow::MainWindow(QWidget* parent)
   ui_weight_labels_.push_back(ui->w9label);
   ui_weight_labels_.push_back(ui->w10label);
 
+  // Setup all labels to automatically scale their contents
+  for (auto& uilabel : ui_weight_labels_) {
+    uilabel->setScaledContents(true);
+  }
+
+  ui->piclabel->setScaledContents(true);
+  ui->piclabel_zoomed->setScaledContents(true);
+
   resetUI();
 }
 
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::updateImage() {
+  // Chose what image from CIFAR dataset to display
   const size_t index = static_cast<size_t>(ui->labelSpinBox->value());
-  if (index >= trainset.images().size()) return;
-  const auto cifar_image = trainset.getImage(index);
-  QImage img(cifar_image.width(), cifar_image.height(), QImage::Format_RGB888);
-  for (size_t x = 0; x < cifar_image.width(); ++x) {
-    for (size_t y = 0; y < cifar_image.height(); ++y) {
-      int red = cifar_image(x, y, Image::Channel::RED);
-      int green = cifar_image(x, y, Image::Channel::GREEN);
-      int blue = cifar_image(x, y, Image::Channel::BLUE);
-      img.setPixel(static_cast<int>(x), static_cast<int>(y), qRgb(red, green, blue));
-    }
+  Image cifar_image;
+  if (!trainset.getImage(index, cifar_image)) {
+    std::cerr << "Unable to get image from the trainset!";
+    return;
   }
-  img = img.scaled(ui->piclabel->width(), ui->piclabel->height(), Qt::KeepAspectRatio);
+  QImage img = cifarImageToQImage(cifar_image);
   ui->piclabel->setPixmap(QPixmap::fromImage(img));
-  img =
-      img.scaled(ui->piclabel_zoomed->width(), ui->piclabel_zoomed->height(), Qt::KeepAspectRatio);
   ui->piclabel_zoomed->setPixmap(QPixmap::fromImage(img));
+  // Display the image's correct label
   ui->labelLineEdit->setText(QString::fromStdString(kCIFAR10Labels[trainset.labels()[index]]));
 
-  std::vector<float> scores = classifier->computeScores(trainset.images()[index]);
-  int predicted_label = classifier->infer(trainset.images()[index]);
+  const size_t predicted_label = classifier->infer(trainset.images()[index]);
   ui->predictionLineEdit->setText(QString::fromStdString(kCIFAR10Labels[predicted_label]));
 
+  const std::vector<float> scores = classifier->computeScores(trainset.images()[index]);
   for (size_t i = 0; i < ui_labels_score_.size(); ++i) {
     ui_labels_score_[i]->setText(QString::number(static_cast<double>(scores[i]), 10, 5));
   }
@@ -138,14 +158,14 @@ void MainWindow::on_actionOpen_dataset_triggered() {
   dir.setNameFilters(filters);
 
   foreach (QFileInfo mitm, dir.entryInfoList()) {
-    trainset.readBin(mitm.absoluteFilePath().toUtf8().constData(), true);
+    trainset.readBin(mitm.absoluteFilePath().toStdString(), true);
   }
 
   filters.clear();
   filters << "test_batch.bin";
   dir.setNameFilters(filters);
   foreach (QFileInfo mitm, dir.entryInfoList()) {
-    testset.readBin(mitm.absoluteFilePath().toUtf8().constData(), true);
+    testset.readBin(mitm.absoluteFilePath().toStdString(), true);
   }
 
   updateImage();
@@ -156,20 +176,16 @@ void MainWindow::visualizeWeights() {
   normW.normalize(0, 255);
   for (size_t i = 0; i < ui_weight_labels_.size(); ++i) {
     auto& weight_label = ui_weight_labels_[i];
-    // \todo remove hard coded size
-    QImage img(32, 32, QImage::Format_RGB888);
-    weight2image(normW, i, img);
-    img = img.scaledToWidth(weight_label->width(), Qt::SmoothTransformation);
+    const QImage img = weight2image(normW, i);
     weight_label->setPixmap(QPixmap::fromImage(img));
     weight_label->show();
   }
 }
 
 float MainWindow::evaluateAcc() {
-  int correct = 0;
-  int total = 0;
+  int correct{0}, total{0};
   for (size_t i = 0; i < testset.images().size(); ++i) {
-    int label = classifier->infer(testset.images()[i]);
+    const size_t label = classifier->infer(testset.images()[i]);
     if (label == testset.labels()[i]) correct++;
     total++;
   }

@@ -69,7 +69,7 @@ float LinearSVM::computeLoss(const std::vector<std::vector<float> >& images,
   return L;
 }
 
-int LinearSVM::infer(const std::vector<float>& image) const {
+size_t LinearSVM::infer(const std::vector<float>& image) const {
   // scores = W*x
   std::vector<float> scores = computeScores(image);
   // Get the index of the max element
