@@ -128,11 +128,11 @@ void MainWindow::updateImage() {
   ui->piclabel_zoomed->setPixmap(QPixmap::fromImage(img));
   // Display the image's correct label
   ui->labelLineEdit->setText(
-      QString::fromStdString(kCIFAR10Labels[trainset.labels()[index]]));
+      QString::fromStdString(kCIFAR10Labels.at(trainset.labels()[index])));
 
   const size_t predicted_label = classifier->infer(trainset.images()[index]);
   ui->predictionLineEdit->setText(
-      QString::fromStdString(kCIFAR10Labels[predicted_label]));
+      QString::fromStdString(kCIFAR10Labels.at(predicted_label)));
 
   const std::vector<float> scores =
       classifier->computeScores(trainset.images()[index]);
@@ -250,7 +250,7 @@ void MainWindow::on_pushButton_clicked() {
   }
 }
 
-void MainWindow::on_labelSpinBox_valueChanged(int  /*arg1*/) { updateImage(); }
+void MainWindow::on_labelSpinBox_valueChanged(int /*arg1*/) { updateImage(); }
 
 void MainWindow::on_stopButton_clicked() { stopped_ = true; }
 
@@ -259,7 +259,7 @@ void MainWindow::on_resetButton_clicked() {
   visualizeWeights();
 }
 
-void MainWindow::on_learningRateBox_valueChanged(int  /*lr_exp*/) {
+void MainWindow::on_learningRateBox_valueChanged(int /*lr_exp*/) {
   classifier->learning_rate_ = std::pow(10.f, -ui->learningRateBox->value());
   std::cout << "New learning rate value "
             << std::pow(10.f, -ui->learningRateBox->value()) << std::endl;

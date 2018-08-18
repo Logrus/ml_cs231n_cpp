@@ -36,8 +36,8 @@ float LinearSoftmax::lossForSingleImage(const std::vector<float>& image,
   }
 
   // 3. Normalize to get probabilities
-  const float normalizer =
-      std::accumulate(unnormalized_prob.begin(), unnormalized_prob.end(), 0.0f);
+  const double normalizer =
+      std::accumulate(unnormalized_prob.begin(), unnormalized_prob.end(), 0.0);
   std::vector<double> probabilities(classes_dim_, 0);
   for (size_t j = 0; j < classes_dim_; ++j) {
     probabilities[j] = unnormalized_prob[j] / normalizer;
@@ -100,7 +100,7 @@ size_t LinearSoftmax::infer(const std::vector<float>& image) const {
 }
 
 std::vector<float> LinearSoftmax::inferenceLoss(const std::vector<float>& image,
-                                                const size_t  /*y*/) const {
+                                                const size_t /*y*/) const {
   // Compute scores
   // scores = W*x
   std::vector<float> scores = computeScores(image);

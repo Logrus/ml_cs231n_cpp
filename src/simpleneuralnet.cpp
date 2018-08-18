@@ -61,11 +61,11 @@ float SimpleNeuralNet::loss(const std::vector<std::vector<float>>& images,
     }
   }
 
-  for (float & i : db2) {
+  for (float& i : db2) {
     i /= static_cast<float>(N);
   }
 
-  for (float & i : db1) {
+  for (float& i : db1) {
     i /= static_cast<float>(N);
   }
 
